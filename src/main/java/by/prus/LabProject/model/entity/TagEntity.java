@@ -6,7 +6,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "tag")
-public class Tag implements Serializable {
+public class TagEntity implements Serializable {
 
     private static final long serialVerisonUID = 2342353453245L;
 

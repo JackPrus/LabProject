@@ -11,7 +11,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "gift_certificate")
-public class GiftCertificate implements Serializable {
+public class GiftCertificateEntity implements Serializable {
 
     private static final long serialVerisonUID = 2342353453245L;
 

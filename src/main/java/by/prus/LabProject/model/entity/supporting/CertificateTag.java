@@ -1,7 +1,7 @@
 package by.prus.LabProject.model.entity.supporting;
 
-import by.prus.LabProject.model.entity.GiftCertificate;
-import by.prus.LabProject.model.entity.Tag;
+import by.prus.LabProject.model.entity.GiftCertificateEntity;
+import by.prus.LabProject.model.entity.TagEntity;
 
 import javax.persistence.*;
 
@@ -13,10 +13,10 @@ public class CertificateTag {
 
     @ManyToOne
     @JoinColumn(name = "gift_certificat_id")
-    GiftCertificate giftCertificate;
+    GiftCertificateEntity giftCertificate;
 
     @ManyToOne
     @JoinColumn(name = "tag_id")
-    Tag tag;
+    TagEntity tag;
 
 }

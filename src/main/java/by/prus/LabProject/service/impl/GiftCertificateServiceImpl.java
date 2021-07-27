@@ -1,6 +1,7 @@
 package by.prus.LabProject.service.impl;
 
 import by.prus.LabProject.model.dto.GiftCertificateDTO;
+import by.prus.LabProject.model.entity.GiftCertificateEntity;
 import by.prus.LabProject.repository.GiftCertificateRepository;
 import by.prus.LabProject.service.GiftCertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,9 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     public GiftCertificateDTO createCertificate(GiftCertificateDTO giftCertificateDTO) {
+
+        GiftCertificateEntity giftCertificateEntity = giftCertificateRepository.findById(giftCertificateDTO.getId());
+
         return null;
     }
 
