@@ -5,7 +5,7 @@ import by.prus.LabProject.model.entity.TagEntity;
 
 import javax.persistence.*;
 
-@Entity
+
 public class CertificateTag {
 
     @Id

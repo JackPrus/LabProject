@@ -1,20 +1,19 @@
 package by.prus.LabProject.controller;
 
+import by.prus.LabProject.exception.CertificateServiceException;
 import by.prus.LabProject.model.dto.GiftCertificateDTO;
 import by.prus.LabProject.model.request.GiftCertificateRequest;
+import by.prus.LabProject.model.response.ErrorMessages;
 import by.prus.LabProject.model.response.GiftCertificateResponse;
 import by.prus.LabProject.service.GiftCertificateService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("certificates")
-//http://localhost:8080/labproject/certificates/
+@RequestMapping("certificate")
+//http://localhost:8080/labproject/certificate/
 public class GiftCertificateController {
 
     @Autowired
@@ -28,7 +27,16 @@ public class GiftCertificateController {
 
         GiftCertificateResponse returnValue = new GiftCertificateResponse();
 
-        //if (userDetails.getFirstName().isEmpty()) {throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());}
+        if (
+                certificate.getDescription().isEmpty() ||
+                        certificate.getCreateDate()==null ||
+                        certificate.getDuration()==0 ||
+                        certificate.getLastUpdateDate()==null ||
+                        certificate.getName().isEmpty() ||
+                        certificate.getPrice() == null
+        ) {
+            throw new CertificateServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
+        }
 
         ModelMapper modelMapper = new ModelMapper();
         GiftCertificateDTO giftCertificateDTO = modelMapper.map(certificate, GiftCertificateDTO.class); // копируются поля из одного класса в одноименные поля другого.
@@ -38,6 +46,20 @@ public class GiftCertificateController {
 
         return  returnValue;
 
+    }
+
+    @GetMapping(
+            path = "/{id}",
+            produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
+    )
+    public GiftCertificateResponse getUser (@PathVariable Long id){
+
+        ModelMapper modelMapper = new ModelMapper();
+
+        GiftCertificateDTO giftCertificateDTO = giftCertificateService.getCertificate(id);
+        GiftCertificateResponse returnValue = modelMapper.map(giftCertificateDTO, GiftCertificateResponse.class);
+
+        return returnValue;
     }
 
 }
