@@ -2,6 +2,7 @@ package by.prus.LabProject.controller;
 
 import by.prus.LabProject.exception.CertificateServiceException;
 import by.prus.LabProject.model.dto.GiftCertificateDTO;
+import by.prus.LabProject.model.dto.TagDTO;
 import by.prus.LabProject.model.request.GiftCertificateRequest;
 import by.prus.LabProject.model.response.ErrorMessages;
 import by.prus.LabProject.model.response.GiftCertificateResponse;
@@ -45,7 +46,6 @@ public class GiftCertificateController {
         returnValue = modelMapper.map(createdCertificate, GiftCertificateResponse.class);
 
         return  returnValue;
-
     }
 
     @GetMapping(

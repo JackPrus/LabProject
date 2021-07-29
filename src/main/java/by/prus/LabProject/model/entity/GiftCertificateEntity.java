@@ -1,12 +1,17 @@
 package by.prus.LabProject.model.entity;
 
 
+import by.prus.LabProject.model.entity.supporting.CertificateTag;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.aspectj.apache.bcel.generic.Tag;
+
 import javax.persistence.*;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Min;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -41,8 +46,23 @@ public class GiftCertificateEntity implements Serializable {
     @Column (nullable = false)
     private Date lastUpdateDate;
 
-//    @OneToMany(mappedBy = "tag", fetch = FetchType.LAZY)
-//    Set<Tag> tags;
+    @JsonIgnore
+    @OneToMany(mappedBy = "giftCertificate", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<CertificateTag> certificateTags;
+
+    /*
+    @ManyToMany
+    @JoinTable(
+                name = "certificate_tag",
+            joinColumns = @JoinColumn (name = "gift_certificate_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+            )
+    Set<TagEntity> tagSet = new HashSet<>();
+
+    Many to many examples
+    https://github.com/kriscfoster/Spring-Data-JPA-Relationships/blob/c8d46448d5f433ca783db64694c215824995bc52/src/main/java/com/kriscfoster/school/student/Student.java#L11
+    https://github.com/bartoszkomin/hibernate-many-to-many-demo/blob/master/src/main/java/com/blogspot/bartoszkomin/hibernate_many_to_many_demo/model/User.java
+ */
 
     public long getId() { return id; }
     public void setId(long id) { this.id = id; }
@@ -59,4 +79,6 @@ public class GiftCertificateEntity implements Serializable {
     public Date getLastUpdateDate() { return lastUpdateDate; }
     public void setLastUpdateDate(Date lastUpdateDate) { this.lastUpdateDate = lastUpdateDate; }
 
+    public Set<CertificateTag> getCertificateTags() { return certificateTags; }
+    public void setCertificateTags(Set<CertificateTag> certificateTags) { this.certificateTags = certificateTags; }
 }

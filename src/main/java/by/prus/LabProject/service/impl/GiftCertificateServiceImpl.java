@@ -2,7 +2,10 @@ package by.prus.LabProject.service.impl;
 
 import by.prus.LabProject.exception.CertificateServiceException;
 import by.prus.LabProject.model.dto.GiftCertificateDTO;
+import by.prus.LabProject.model.dto.TagDTO;
 import by.prus.LabProject.model.entity.GiftCertificateEntity;
+import by.prus.LabProject.model.entity.TagEntity;
+import by.prus.LabProject.model.entity.supporting.CertificateTag;
 import by.prus.LabProject.repository.GiftCertificateRepository;
 import by.prus.LabProject.service.GiftCertificateService;
 import org.modelmapper.ModelMapper;
@@ -47,4 +50,5 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
         return returnValue;
     }
+
 }

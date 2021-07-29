@@ -5,18 +5,24 @@ import by.prus.LabProject.model.entity.TagEntity;
 
 import javax.persistence.*;
 
-
+@Entity
+@Table(name = "certificate_tag")
 public class CertificateTag {
 
     @Id
+    @GeneratedValue
     private long id;
 
-    @ManyToOne
-    @JoinColumn(name = "gift_certificat_id")
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "gift_certificate_id")
     GiftCertificateEntity giftCertificate;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "tag_id")
     TagEntity tag;
 
+    public GiftCertificateEntity getGiftCertificate() { return giftCertificate;}
+    public void setGiftCertificate(GiftCertificateEntity giftCertificate) { this.giftCertificate = giftCertificate;}
+    public TagEntity getTag() { return tag;}
+    public void setTag(TagEntity tag) { this.tag = tag;}
 }
