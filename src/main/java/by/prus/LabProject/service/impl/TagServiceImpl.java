@@ -1,8 +1,11 @@
 package by.prus.LabProject.service.impl;
 
+import by.prus.LabProject.exception.CertificateServiceException;
 import by.prus.LabProject.exception.TagServiceException;
 import by.prus.LabProject.model.dto.TagDTO;
+import by.prus.LabProject.model.entity.GiftCertificateEntity;
 import by.prus.LabProject.model.entity.TagEntity;
+import by.prus.LabProject.model.response.ErrorMessages;
 import by.prus.LabProject.repository.TagRepository;
 import by.prus.LabProject.service.TagService;
 import org.modelmapper.ModelMapper;
@@ -33,7 +36,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public TagDTO getTag(long id) {
+    public TagDTO getTag(Long id) {
 
         Optional<TagEntity> optionalTag =tagRepository.findById(id);
         if (optionalTag.isEmpty()){throw new TagServiceException("Tag with this ID does not exist");}
@@ -45,4 +48,30 @@ public class TagServiceImpl implements TagService {
 
         return returnValue;
     }
+
+    @Override
+    public TagDTO updateTag(Long tagId, TagDTO tagDTO) {
+
+        Optional<TagEntity> optionalTag =tagRepository.findById(tagId);
+        if (optionalTag.isEmpty()){throw new TagServiceException("Tag with this ID does not exist");}
+
+        ModelMapper modelMapper = new ModelMapper();
+        TagEntity tagToUpdate = optionalTag.get();
+        tagToUpdate.setName(tagDTO.getName());
+        TagEntity updatedTag = tagRepository.save(tagToUpdate);
+
+        TagDTO returnValue = modelMapper.map(updatedTag, TagDTO.class);
+
+        return returnValue;
+    }
+
+    @Override
+    public void deleteTag(Long tagId) {
+        Optional<TagEntity> tagOptional = tagRepository.findById(tagId);
+        if (tagOptional.isEmpty()){
+            throw new TagServiceException(ErrorMessages.MISSING_TAG_WITH_THIS_PARAMETR.getErrorMessage());
+        }
+        tagRepository.delete(tagOptional.get());
+    }
+
 }

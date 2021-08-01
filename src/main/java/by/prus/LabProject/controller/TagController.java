@@ -5,6 +5,7 @@ import by.prus.LabProject.model.dto.TagDTO;
 import by.prus.LabProject.model.entity.TagEntity;
 import by.prus.LabProject.model.request.TagRequest;
 import by.prus.LabProject.model.response.ErrorMessages;
+import by.prus.LabProject.model.response.OperationStatusModel;
 import by.prus.LabProject.model.response.TagResponse;
 import by.prus.LabProject.service.TagService;
 import org.modelmapper.ModelMapper;
@@ -55,6 +56,40 @@ public class TagController {
 
         TagResponse returnValue = modelMapper.map(tagDTO, TagResponse.class);
 
+        return returnValue;
+    }
+
+    @PutMapping(
+            path = "{tagId}",
+            produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
+            consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
+    )
+    public TagResponse updateTag (@PathVariable Long tagId, @RequestBody TagRequest tagRequest){
+
+        if (tagRequest.getName().isEmpty()){
+            throw new TagServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
+        }
+
+        ModelMapper modelMapper = new ModelMapper();
+        TagDTO tagToUpdate = modelMapper.map(tagRequest, TagDTO.class);
+
+        TagDTO updatedTag = tagService.updateTag(tagId, tagToUpdate);
+        TagResponse returnValue = modelMapper.map(updatedTag, TagResponse.class);
+
+        return returnValue;
+    }
+
+    @DeleteMapping(
+            path = "{tagId}",
+            produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
+    )
+    public OperationStatusModel deleteCertificate (@PathVariable Long tagId){
+
+        OperationStatusModel returnValue = new OperationStatusModel();
+        returnValue.setOperationName("Delete of Tag with Id: " +tagId);
+
+        tagService.deleteTag(tagId);
+        returnValue.setOperationResult("Status : Deleted successfuly");
         return returnValue;
     }
 

@@ -6,6 +6,7 @@ import by.prus.LabProject.model.dto.TagDTO;
 import by.prus.LabProject.model.entity.GiftCertificateEntity;
 import by.prus.LabProject.model.entity.TagEntity;
 import by.prus.LabProject.model.entity.supporting.CertificateTag;
+import by.prus.LabProject.model.response.ErrorMessages;
 import by.prus.LabProject.repository.GiftCertificateRepository;
 import by.prus.LabProject.service.GiftCertificateService;
 import org.modelmapper.ModelMapper;
@@ -49,6 +50,39 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         GiftCertificateDTO returnValue = modelMapper.map(certificateEntity, GiftCertificateDTO.class);
 
         return returnValue;
+    }
+
+    @Override
+    public GiftCertificateDTO updateCertificate(Long certificateId, GiftCertificateDTO giftCertificateDTO) {
+
+        Optional<GiftCertificateEntity> optionalCertificate = giftCertificateRepository.findById(certificateId);
+        if (optionalCertificate.isEmpty()){
+            throw new CertificateServiceException("certificate with this ID does not exist");
+        }
+
+        GiftCertificateEntity certificateEntity = optionalCertificate.get();
+
+        certificateEntity.setDescription(giftCertificateDTO.getDescription());
+        certificateEntity.setDuration(giftCertificateDTO.getDuration());
+        certificateEntity.setCreateDate(giftCertificateDTO.getCreateDate());
+        certificateEntity.setLastUpdateDate(giftCertificateDTO.getLastUpdateDate());
+        certificateEntity.setName(giftCertificateDTO.getName());
+        certificateEntity.setPrice(giftCertificateDTO.getPrice());
+
+        GiftCertificateEntity updatedCertificate = giftCertificateRepository.save(certificateEntity);
+        ModelMapper modelMapper = new ModelMapper();
+        GiftCertificateDTO returnValue = modelMapper.map(updatedCertificate, GiftCertificateDTO.class);
+
+        return returnValue;
+    }
+
+    @Override
+    public void deleteCertificate(Long certificateId) {
+        Optional<GiftCertificateEntity> certificateOptional = giftCertificateRepository.findById(certificateId);
+        if (certificateOptional.isEmpty()){
+            throw new CertificateServiceException(ErrorMessages.MISSING_CERTIFICATE_WITH_THIS_PARAMETR.getErrorMessage());
+        }
+        giftCertificateRepository.delete(certificateOptional.get());
     }
 
 }
