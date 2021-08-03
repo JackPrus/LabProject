@@ -46,8 +46,10 @@ public class GiftCertificateEntity implements Serializable {
     @Column (nullable = false)
     private Date lastUpdateDate;
 
+    //cascade = {CascadeType.MERGE, CascadeType.PERSIST}
+
     @JsonIgnore
-    @OneToMany(mappedBy = "giftCertificate", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "giftCertificate", cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
     private Set<CertificateTag> certificateTags;
 
     /*

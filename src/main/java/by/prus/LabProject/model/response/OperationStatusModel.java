@@ -1,11 +1,13 @@
 package by.prus.LabProject.model.response;
 
+import java.io.Serializable;
+
 /**
  * Class needed for translation message in rest API.
  * For example delete of entity. This class convert to JSON and
  * tells about successful or no operation
  */
-public class OperationStatusModel {
+public class OperationStatusModel implements Serializable {
 
     private String operationResult;
     private String operationName;

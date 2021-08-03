@@ -7,6 +7,7 @@ import by.prus.LabProject.model.entity.GiftCertificateEntity;
 import by.prus.LabProject.model.entity.TagEntity;
 import by.prus.LabProject.model.entity.supporting.CertificateTag;
 import by.prus.LabProject.model.response.ErrorMessages;
+import by.prus.LabProject.repository.CertificateTagRepository;
 import by.prus.LabProject.repository.GiftCertificateRepository;
 import by.prus.LabProject.service.GiftCertificateService;
 import org.modelmapper.ModelMapper;
@@ -20,6 +21,8 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Autowired
     GiftCertificateRepository giftCertificateRepository;
+    @Autowired
+    CertificateTagRepository certificateTagRepository;
 
     @Override
     public GiftCertificateDTO createCertificate(GiftCertificateDTO giftCertificateDTO) {
@@ -82,7 +85,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         if (certificateOptional.isEmpty()){
             throw new CertificateServiceException(ErrorMessages.MISSING_CERTIFICATE_WITH_THIS_PARAMETR.getErrorMessage());
         }
-        giftCertificateRepository.delete(certificateOptional.get());
+        giftCertificateRepository.deleteById(certificateId);
     }
 
 }

@@ -21,8 +21,9 @@ public class TagEntity implements Serializable {
     @Column(nullable = false)
     private String name;
 
+    //cascade = {CascadeType.MERGE, CascadeType.PERSIST}
     @JsonIgnore
-    @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "tag", cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
     private Set<CertificateTag> certificateTags;
 
     /*

@@ -6,6 +6,7 @@ import by.prus.LabProject.model.dto.TagDTO;
 import by.prus.LabProject.model.entity.GiftCertificateEntity;
 import by.prus.LabProject.model.entity.TagEntity;
 import by.prus.LabProject.model.response.ErrorMessages;
+import by.prus.LabProject.repository.CertificateTagRepository;
 import by.prus.LabProject.repository.TagRepository;
 import by.prus.LabProject.service.TagService;
 import org.modelmapper.ModelMapper;
@@ -20,6 +21,8 @@ public class TagServiceImpl implements TagService {
 
     @Autowired
     TagRepository tagRepository;
+    @Autowired
+    CertificateTagRepository certificateTagRepository;
 
     @Override
     public TagDTO createTag(TagDTO tagDTO) {
@@ -71,7 +74,11 @@ public class TagServiceImpl implements TagService {
         if (tagOptional.isEmpty()){
             throw new TagServiceException(ErrorMessages.MISSING_TAG_WITH_THIS_PARAMETR.getErrorMessage());
         }
-        tagRepository.delete(tagOptional.get());
+
+        // clear all associated connections before delete
+        certificateTagRepository.deleteAllConnectionsFromRemovingTag(tagId);
+
+        tagRepository.deleteById(tagId);
     }
 
 }

@@ -4,6 +4,7 @@ import by.prus.LabProject.model.entity.GiftCertificateEntity;
 import by.prus.LabProject.model.entity.TagEntity;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "certificate_tag")
