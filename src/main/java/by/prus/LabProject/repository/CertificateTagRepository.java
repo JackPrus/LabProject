@@ -13,14 +13,4 @@ import java.util.List;
 @Repository
 public interface CertificateTagRepository extends CrudRepository<CertificateTag, Long> {
 
-    @Transactional
-    @Modifying
-    @Query(value="delete from certificate_tag ct where ct.tag_id = ?1", nativeQuery=true)
-    void deleteAllConnectionsFromRemovingTag(Long tagId);
-
-    @Transactional
-    @Modifying
-    @Query(value="delete from certificate_tag ct where ct.gift_certificate_id =: certificateId", nativeQuery=true)
-    void deleteAllConnectionsFromRemovingCertificate(@Param("certificateId") Long certificateId);
-
 }

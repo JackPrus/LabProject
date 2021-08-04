@@ -1,6 +1,7 @@
 package by.prus.LabProject.model.entity;
 
 import by.prus.LabProject.model.entity.supporting.CertificateTag;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -22,8 +23,8 @@ public class TagEntity implements Serializable {
     private String name;
 
     //cascade = {CascadeType.MERGE, CascadeType.PERSIST}
-    @JsonIgnore
-    @OneToMany(mappedBy = "tag", cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
+    @JsonBackReference
+    @OneToMany(mappedBy = "tag", cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
     private Set<CertificateTag> certificateTags;
 
     /*

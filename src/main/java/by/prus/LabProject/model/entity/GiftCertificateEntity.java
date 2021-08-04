@@ -2,6 +2,7 @@ package by.prus.LabProject.model.entity;
 
 
 import by.prus.LabProject.model.entity.supporting.CertificateTag;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.aspectj.apache.bcel.generic.Tag;
 
@@ -48,8 +49,8 @@ public class GiftCertificateEntity implements Serializable {
 
     //cascade = {CascadeType.MERGE, CascadeType.PERSIST}
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "giftCertificate", cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
+    @JsonBackReference
+    @OneToMany(mappedBy = "giftCertificate", cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
     private Set<CertificateTag> certificateTags;
 
     /*

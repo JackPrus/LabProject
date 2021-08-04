@@ -14,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @RequestMapping("certificate")
 //http://localhost:8080/labproject/certificate/
@@ -103,6 +106,22 @@ public class GiftCertificateController {
 
         giftCertificateService.deleteCertificate(certificateId);
         returnValue.setOperationResult("Status : Deleted successfuly");
+        return returnValue;
+    }
+
+    @GetMapping(
+            path = "/search/{partOfCertName}",
+            produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
+    )
+    public List<GiftCertificateResponse> getListOfCertificatesByPartOfName (@PathVariable String partOfCertName){
+        List<GiftCertificateDTO> certificatesDTO = giftCertificateService.findCertificatesByNamePart(partOfCertName);
+        List <GiftCertificateResponse> returnValue = new ArrayList<>();
+        ModelMapper modelMapper = new ModelMapper();
+
+        for (GiftCertificateDTO gcDTO : certificatesDTO){
+            returnValue.add(modelMapper.map(gcDTO, GiftCertificateResponse.class));
+        }
+
         return returnValue;
     }
 

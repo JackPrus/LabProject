@@ -74,11 +74,7 @@ public class TagServiceImpl implements TagService {
         if (tagOptional.isEmpty()){
             throw new TagServiceException(ErrorMessages.MISSING_TAG_WITH_THIS_PARAMETR.getErrorMessage());
         }
-
-        // clear all associated connections before delete
-        certificateTagRepository.deleteAllConnectionsFromRemovingTag(tagId);
-
-        tagRepository.deleteById(tagId);
+        tagRepository.deleteTag(tagId);
     }
 
 }

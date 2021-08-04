@@ -7,6 +7,7 @@ import by.prus.LabProject.model.entity.GiftCertificateEntity;
 import by.prus.LabProject.model.entity.TagEntity;
 import by.prus.LabProject.model.entity.supporting.CertificateTag;
 import by.prus.LabProject.model.response.ErrorMessages;
+import by.prus.LabProject.model.response.GiftCertificateResponse;
 import by.prus.LabProject.repository.CertificateTagRepository;
 import by.prus.LabProject.repository.GiftCertificateRepository;
 import by.prus.LabProject.service.GiftCertificateService;
@@ -14,6 +15,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,8 +24,6 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Autowired
     GiftCertificateRepository giftCertificateRepository;
-    @Autowired
-    CertificateTagRepository certificateTagRepository;
 
     @Override
     public GiftCertificateDTO createCertificate(GiftCertificateDTO giftCertificateDTO) {
@@ -85,7 +86,22 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         if (certificateOptional.isEmpty()){
             throw new CertificateServiceException(ErrorMessages.MISSING_CERTIFICATE_WITH_THIS_PARAMETR.getErrorMessage());
         }
-        giftCertificateRepository.deleteById(certificateId);
+        giftCertificateRepository.deleteCertificate(certificateId);
+    }
+
+    @Override
+    public List<GiftCertificateDTO> findCertificatesByNamePart(String partOfCertName) {
+
+        List<GiftCertificateEntity> certificateList = giftCertificateRepository.findCertificatesByNamePart(partOfCertName);
+        List<GiftCertificateDTO> returnValue = new ArrayList<>();
+
+        ModelMapper modelMapper = new ModelMapper();
+
+        for (GiftCertificateEntity entity : certificateList){
+            returnValue.add(modelMapper.map(entity, GiftCertificateDTO.class));
+        }
+
+        return returnValue;
     }
 
 }
