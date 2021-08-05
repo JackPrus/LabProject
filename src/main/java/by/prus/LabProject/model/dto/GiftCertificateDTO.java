@@ -2,12 +2,14 @@ package by.prus.LabProject.model.dto;
 
 import by.prus.LabProject.model.entity.TagEntity;
 import by.prus.LabProject.model.entity.supporting.CertificateTag;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.*;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Min;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,11 +23,9 @@ public class GiftCertificateDTO implements Serializable {
     private String description;
     private BigDecimal price;
     private int duration;
-    private Date createDate;
-    private Date lastUpdateDate;
+    private LocalDate createDate;
+    private LocalDate lastUpdateDate;
     private Set<CertificateTag> certificateTags;
-
-//    private Set<TagEntity> tagSet;
 
 
     public long getId() { return id; }
@@ -38,14 +38,11 @@ public class GiftCertificateDTO implements Serializable {
     public void setPrice(BigDecimal price) { this.price = price; }
     public int getDuration() { return duration; }
     public void setDuration(int duration) { this.duration = duration; }
-    public Date getCreateDate() { return createDate; }
-    public void setCreateDate(Date createDate) { this.createDate = createDate; }
-    public Date getLastUpdateDate() { return lastUpdateDate; }
-    public void setLastUpdateDate(Date lastUpdateDate) { this.lastUpdateDate = lastUpdateDate; }
-
+    public LocalDate getCreateDate() { return createDate; }
+    public void setCreateDate(LocalDate createDate) { this.createDate = createDate; }
+    public LocalDate getLastUpdateDate() { return lastUpdateDate; }
+    public void setLastUpdateDate(LocalDate lastUpdateDate) { this.lastUpdateDate = lastUpdateDate; }
     public Set<CertificateTag> getCertificateTags() { return certificateTags; }
     public void setCertificateTags(Set<CertificateTag> certificateTags) { this.certificateTags = certificateTags; }
 
-    //    public Set<TagEntity> getTagSet() { return tagSet; }
-//    public void setTagSet(Set<TagEntity> tagSet) { this.tagSet = tagSet; }
 }

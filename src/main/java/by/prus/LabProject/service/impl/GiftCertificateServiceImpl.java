@@ -15,6 +15,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -34,8 +35,8 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             throw new CertificateServiceException("certificate with this ID already exist");
         }
 
-        giftCertificateDTO.setCreateDate(new Date());
-        giftCertificateDTO.setLastUpdateDate(new Date());
+        giftCertificateDTO.setCreateDate(LocalDate.now());
+        giftCertificateDTO.setLastUpdateDate(LocalDate.now());
 
         ModelMapper modelMapper = new ModelMapper();
         GiftCertificateEntity giftCertificateEntity =modelMapper.map(giftCertificateDTO, GiftCertificateEntity.class);
@@ -67,7 +68,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         if (optionalCertificate.isEmpty()){
             throw new CertificateServiceException("certificate with this ID does not exist");
         }
-        giftCertificateDTO.setLastUpdateDate(new Date());
+        giftCertificateDTO.setLastUpdateDate(LocalDate.now());
         GiftCertificateEntity certificateEntity = optionalCertificate.get();
 
         certificateEntity.setDescription(giftCertificateDTO.getDescription());

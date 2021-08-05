@@ -33,6 +33,10 @@ public class CertificateTagServiceImpl implements CertificateTagService {
         GiftCertificateEntity certificateEntity = getCertificateWithId(certificateId);
         TagEntity tagEntity = getTageWithId(tagId);
 
+        if (isTagExistsForCertificate(certificateEntity, tagEntity)){
+            throw new CertificateServiceException(ErrorMessages.TAG_FOR_CERTIFICATE_ALREADY_EXISTS.getErrorMessage());
+        }
+
         CertificateTag certificateTag = new CertificateTag();
         certificateTag.setGiftCertificate(certificateEntity);
         certificateTag.setTag(tagEntity);
@@ -51,6 +55,10 @@ public class CertificateTagServiceImpl implements CertificateTagService {
 
         GiftCertificateEntity certificateEntity = getCertificateWithId(certificateId);
         TagEntity tagEntity = getTageWithId(tagId);
+
+        if (isTagExistsForCertificate(certificateEntity, tagEntity)){
+            throw new CertificateServiceException(ErrorMessages.TAG_FOR_CERTIFICATE_ALREADY_EXISTS.getErrorMessage());
+        }
 
         CertificateTag certificateTag = new CertificateTag();
         certificateTag.setGiftCertificate(certificateEntity);
@@ -104,6 +112,15 @@ public class CertificateTagServiceImpl implements CertificateTagService {
             throw new TagServiceException(ErrorMessages.MISSING_TAG_WITH_THIS_PARAMETR.getErrorMessage());
         }
         return tagOptional.get();
+    }
+
+    private boolean isTagExistsForCertificate (GiftCertificateEntity giftCertificateEntity, TagEntity tagEntity){
+        for (CertificateTag ct : giftCertificateEntity.getCertificateTags()){
+            if (ct.getTag().getId()==tagEntity.getId()){
+                return true;
+            }
+        }
+        return false;
     }
 
 }

@@ -11,6 +11,7 @@ public enum ErrorMessages {
     COULD_NOT_DELETE_RECORD("Could not delete record"),
     EMAIL_ADDRESS_NOT_VERIFIED("Email address could not be verified"),
     MISSING_CERTIFICATE_WITH_THIS_PARAMETR("Misstin certificat with this ID or other parametr"),
+    TAG_FOR_CERTIFICATE_ALREADY_EXISTS("The certificate already have this tag"),
     MISSING_TAG_WITH_THIS_PARAMETR("Misstin tag with this ID or other parametr");
 
     private String errorMessage;

@@ -12,6 +12,7 @@ import javax.validation.constraints.Digits;
 import javax.validation.constraints.Min;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -40,15 +41,15 @@ public class GiftCertificateEntity implements Serializable {
     @Column (nullable = false)
     private int duration;
 
-    @Temporal(TemporalType.DATE) // check @Temporal , .DATE means date only. Timestamp means - yy.mm.dd.hh.mm.
+    //@Temporal(TemporalType.DATE) // check @Temporal , .DATE means date only. Timestamp means - yy.mm.dd.hh.mm.
     @Column (nullable = false)
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date createDate;
+    private LocalDate createDate;
 
-    @Temporal(TemporalType.DATE)
+    //@Temporal(TemporalType.DATE) // use when we use java.util.date or jaba.sql.date. In case LocalDate we don't need
     @Column (nullable = false)
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date lastUpdateDate;
+    private LocalDate lastUpdateDate;
 
     //cascade = {CascadeType.MERGE, CascadeType.PERSIST}
 
@@ -80,11 +81,10 @@ public class GiftCertificateEntity implements Serializable {
     public void setPrice(BigDecimal price) { this.price = price; }
     public int getDuration() { return duration; }
     public void setDuration(int duration) { this.duration = duration; }
-    public Date getCreateDate() { return createDate; }
-    public void setCreateDate(Date createDate) { this.createDate = createDate; }
-    public Date getLastUpdateDate() { return lastUpdateDate; }
-    public void setLastUpdateDate(Date lastUpdateDate) { this.lastUpdateDate = lastUpdateDate; }
-
+    public LocalDate getCreateDate() { return createDate; }
+    public void setCreateDate(LocalDate createDate) { this.createDate = createDate; }
+    public LocalDate getLastUpdateDate() { return lastUpdateDate; }
+    public void setLastUpdateDate(LocalDate lastUpdateDate) { this.lastUpdateDate = lastUpdateDate; }
     public Set<CertificateTag> getCertificateTags() { return certificateTags; }
     public void setCertificateTags(Set<CertificateTag> certificateTags) { this.certificateTags = certificateTags; }
 }
