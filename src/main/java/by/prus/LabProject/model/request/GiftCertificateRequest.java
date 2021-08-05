@@ -14,10 +14,7 @@ public class GiftCertificateRequest implements Serializable {
     private String description;
     private BigDecimal price;
     private int duration;
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date createDate;
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date lastUpdateDate;
+
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -27,8 +24,5 @@ public class GiftCertificateRequest implements Serializable {
     public void setPrice(BigDecimal price) { this.price = price; }
     public int getDuration() { return duration; }
     public void setDuration(int duration) { this.duration = duration; }
-    public Date getCreateDate() { return createDate; }
-    public void setCreateDate(Date createDate) { this.createDate = createDate; }
-    public Date getLastUpdateDate() { return lastUpdateDate; }
-    public void setLastUpdateDate(Date lastUpdateDate) { this.lastUpdateDate = lastUpdateDate; }
+
 }

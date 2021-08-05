@@ -17,7 +17,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class CertificateTagServiceImpl implements CertificateTagService {
@@ -65,7 +65,28 @@ public class CertificateTagServiceImpl implements CertificateTagService {
         return returnValue;
     }
 
+    @Override
+    public List<GiftCertificateDTO> findCertificatesByTagName(String tagName) {
 
+        List<GiftCertificateDTO> returnValue = new ArrayList<>();
+        List<TagEntity> tagEntityList = tagRepository.findTagsByNamePart(tagName);
+        ModelMapper modelMapper = new ModelMapper();
+
+        for (TagEntity tag : tagEntityList){
+            Set<CertificateTag> connections = tag.getCertificateTags();
+            for (CertificateTag certTag : connections){
+                GiftCertificateEntity certificateEntity = certTag.getGiftCertificate();
+                GiftCertificateDTO certificateDTO = modelMapper.map(certificateEntity, GiftCertificateDTO.class);
+                returnValue.add(certificateDTO);
+            }
+        }
+
+        returnValue.sort(Comparator.comparing(GiftCertificateDTO::getCreateDate).thenComparing(GiftCertificateDTO::getName));
+
+        return returnValue;
+    }
+
+    // всопомгательные методы ниже
 
     private GiftCertificateEntity getCertificateWithId(Long certificateId){
 

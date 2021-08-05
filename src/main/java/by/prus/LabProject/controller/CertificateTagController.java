@@ -10,9 +10,13 @@ import by.prus.LabProject.service.TagService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 //http://localhost:8080/labproject/
@@ -52,6 +56,22 @@ public class CertificateTagController {
         ModelMapper modelMapper = new ModelMapper();
         TagResponse returnValue = modelMapper.map(tagDTO, TagResponse.class);
 
+        return returnValue;
+    }
+
+    @GetMapping(
+            path = "certificate/search/byTag/{tagName}",
+            produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
+    )
+    public List<GiftCertificateResponse> findCertificatesByTag(@PathVariable String tagName){
+
+        List<GiftCertificateDTO> certificatesDTO = certificateTagService.findCertificatesByTagName(tagName);
+        List <GiftCertificateResponse> returnValue = new ArrayList<>();
+        ModelMapper modelMapper = new ModelMapper();
+
+        for (GiftCertificateDTO gcDTO : certificatesDTO){
+            returnValue.add(modelMapper.map(gcDTO, GiftCertificateResponse.class));
+        }
         return returnValue;
     }
 

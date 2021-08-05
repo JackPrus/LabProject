@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,6 +33,9 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         if (optionalCertificate.isPresent()){
             throw new CertificateServiceException("certificate with this ID already exist");
         }
+
+        giftCertificateDTO.setCreateDate(new Date());
+        giftCertificateDTO.setLastUpdateDate(new Date());
 
         ModelMapper modelMapper = new ModelMapper();
         GiftCertificateEntity giftCertificateEntity =modelMapper.map(giftCertificateDTO, GiftCertificateEntity.class);
@@ -63,12 +67,12 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         if (optionalCertificate.isEmpty()){
             throw new CertificateServiceException("certificate with this ID does not exist");
         }
-
+        giftCertificateDTO.setLastUpdateDate(new Date());
         GiftCertificateEntity certificateEntity = optionalCertificate.get();
 
         certificateEntity.setDescription(giftCertificateDTO.getDescription());
         certificateEntity.setDuration(giftCertificateDTO.getDuration());
-        certificateEntity.setCreateDate(giftCertificateDTO.getCreateDate());
+        //certificateEntity.setCreateDate(giftCertificateDTO.getCreateDate()); не изменна эта дата.
         certificateEntity.setLastUpdateDate(giftCertificateDTO.getLastUpdateDate());
         certificateEntity.setName(giftCertificateDTO.getName());
         certificateEntity.setPrice(giftCertificateDTO.getPrice());

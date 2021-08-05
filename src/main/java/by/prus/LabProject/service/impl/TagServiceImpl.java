@@ -2,6 +2,7 @@ package by.prus.LabProject.service.impl;
 
 import by.prus.LabProject.exception.CertificateServiceException;
 import by.prus.LabProject.exception.TagServiceException;
+import by.prus.LabProject.model.dto.GiftCertificateDTO;
 import by.prus.LabProject.model.dto.TagDTO;
 import by.prus.LabProject.model.entity.GiftCertificateEntity;
 import by.prus.LabProject.model.entity.TagEntity;
@@ -14,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -75,6 +78,20 @@ public class TagServiceImpl implements TagService {
             throw new TagServiceException(ErrorMessages.MISSING_TAG_WITH_THIS_PARAMETR.getErrorMessage());
         }
         tagRepository.deleteTag(tagId);
+    }
+
+    @Override
+    public List<TagDTO> findTagByNamePart(String partOfName) {
+        List<TagEntity> tagEntityList = tagRepository.findTagsByNamePart(partOfName);
+        List<TagDTO> returnValue = new ArrayList<>();
+
+        ModelMapper modelMapper = new ModelMapper();
+
+        for (TagEntity entity : tagEntityList){
+            returnValue.add(modelMapper.map(entity, TagDTO.class));
+        }
+
+        return returnValue;
     }
 
 }

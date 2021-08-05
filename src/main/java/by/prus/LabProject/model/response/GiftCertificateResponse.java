@@ -2,6 +2,7 @@ package by.prus.LabProject.model.response;
 
 import by.prus.LabProject.model.entity.TagEntity;
 import by.prus.LabProject.model.entity.supporting.CertificateTag;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -19,7 +20,6 @@ public class GiftCertificateResponse implements Serializable {
     private int duration;
     private Date createDate;
     private Date lastUpdateDate;
-//    private Set<TagEntity> tagSet;
     private Set<CertificateTag> certificateTags;
 
     public long getId() { return id; }
@@ -40,6 +40,4 @@ public class GiftCertificateResponse implements Serializable {
     public Set<CertificateTag> getCertificateTags() { return certificateTags; }
     public void setCertificateTags(Set<CertificateTag> certificateTags) { this.certificateTags = certificateTags; }
 
-    //    public Set<TagEntity> getTagSet() { return tagSet; }
-//    public void setTagSet(Set<TagEntity> tagSet) { this.tagSet = tagSet; }
 }

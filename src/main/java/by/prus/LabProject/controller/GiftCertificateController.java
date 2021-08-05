@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -26,8 +27,8 @@ public class GiftCertificateController {
     GiftCertificateService giftCertificateService;
 
     @PostMapping(
-            produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
-            consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
+            produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}, // то что возвращает
+            consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}  // то что принимает от клиента
     )
     public GiftCertificateResponse createUser(@RequestBody GiftCertificateRequest certificate) { // конвертирует Java объект в JSON файл
 
@@ -84,9 +85,7 @@ public class GiftCertificateController {
 
         if
         (       certificate.getDescription().isEmpty() ||
-                certificate.getCreateDate()==null ||
                 certificate.getDuration()==0 ||
-                certificate.getLastUpdateDate()==null ||
                 certificate.getName().isEmpty() ||
                 certificate.getPrice() == null
         ) {
@@ -121,7 +120,6 @@ public class GiftCertificateController {
         for (GiftCertificateDTO gcDTO : certificatesDTO){
             returnValue.add(modelMapper.map(gcDTO, GiftCertificateResponse.class));
         }
-
         return returnValue;
     }
 

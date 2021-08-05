@@ -5,6 +5,7 @@ import by.prus.LabProject.model.entity.supporting.CertificateTag;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.aspectj.apache.bcel.generic.Tag;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import javax.validation.constraints.Digits;
@@ -41,10 +42,12 @@ public class GiftCertificateEntity implements Serializable {
 
     @Temporal(TemporalType.DATE) // check @Temporal , .DATE means date only. Timestamp means - yy.mm.dd.hh.mm.
     @Column (nullable = false)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date createDate;
 
     @Temporal(TemporalType.DATE)
     @Column (nullable = false)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date lastUpdateDate;
 
     //cascade = {CascadeType.MERGE, CascadeType.PERSIST}

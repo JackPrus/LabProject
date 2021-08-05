@@ -12,7 +12,6 @@ public class TagResponse implements Serializable {
 
     private long id;
     private String name;
-//    private Set<GiftCertificateEntity> certificatesSet;
     private Set<CertificateTag> certificateTags;
 
     public long getId() { return id; }
@@ -24,6 +23,4 @@ public class TagResponse implements Serializable {
     public Set<CertificateTag> getCertificateTags() { return certificateTags; }
     public void setCertificateTags(Set<CertificateTag> certificateTags) { this.certificateTags = certificateTags; }
 
-    //    public Set<GiftCertificateEntity> getCertificatesSet() { return certificatesSet; }
-//    public void setCertificatesSet(Set<GiftCertificateEntity> certificatesSet) { this.certificatesSet = certificatesSet; }
 }

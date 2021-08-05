@@ -1,10 +1,12 @@
 package by.prus.LabProject.controller;
 
 import by.prus.LabProject.exception.TagServiceException;
+import by.prus.LabProject.model.dto.GiftCertificateDTO;
 import by.prus.LabProject.model.dto.TagDTO;
 import by.prus.LabProject.model.entity.TagEntity;
 import by.prus.LabProject.model.request.TagRequest;
 import by.prus.LabProject.model.response.ErrorMessages;
+import by.prus.LabProject.model.response.GiftCertificateResponse;
 import by.prus.LabProject.model.response.OperationStatusModel;
 import by.prus.LabProject.model.response.TagResponse;
 import by.prus.LabProject.service.TagService;
@@ -15,6 +17,8 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping ("tag")
@@ -90,6 +94,21 @@ public class TagController {
 
         tagService.deleteTag(tagId);
         returnValue.setOperationResult("Status : Deleted successfuly");
+        return returnValue;
+    }
+
+    @GetMapping(
+            path = "/search/{partOfTagName}",
+            produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
+    )
+    public List<TagResponse> getListOfTagsByPartOfName (@PathVariable String partOfTagName){
+        List<TagDTO> tagsDTO = tagService.findTagByNamePart(partOfTagName);
+        List<TagResponse> returnValue = new ArrayList<>();
+        ModelMapper modelMapper = new ModelMapper();
+
+        for (TagDTO tagDTO : tagsDTO){
+            returnValue.add(modelMapper.map(tagDTO, TagResponse.class));
+        }
         return returnValue;
     }
 
