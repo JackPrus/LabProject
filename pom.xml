@@ -64,6 +64,26 @@
 			<version>2.4.4</version>
 		</dependency>
 
+		<!-- HATEOAS представление ответа со ссылками
+		ответ должен extends RepresentationModel<TagResponse>
+
+		-->
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-hateoas</artifactId>
+		</dependency>
+
+
+
+		<!-- браузер для Rest приложений. Удобная штука для рест запросов -->
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-rest-hal-browser</artifactId>
+			<version>3.3.9.RELEASE</version>
+		</dependency>
+
+
 
 
 	</dependencies>

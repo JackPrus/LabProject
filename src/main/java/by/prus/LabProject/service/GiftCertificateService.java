@@ -12,5 +12,6 @@ public interface GiftCertificateService {
     GiftCertificateDTO updateCertificate(Long certificateId, GiftCertificateDTO giftCertificateDTO);
     void deleteCertificate(Long certificateId);
     List<GiftCertificateDTO> findCertificatesByNamePart(String partOfCertName);
+    List<GiftCertificateDTO> getCertificates(int page,int limit);
 
 }

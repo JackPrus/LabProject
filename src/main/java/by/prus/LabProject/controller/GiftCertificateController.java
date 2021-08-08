@@ -10,11 +10,16 @@ import by.prus.LabProject.model.response.OperationStatusModel;
 import by.prus.LabProject.service.GiftCertificateService;
 import jdk.dynalink.Operation;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -122,5 +127,33 @@ public class GiftCertificateController {
         }
         return returnValue;
     }
+
+    //ПАГИНАЦИЯ
+    //http://localhost:8080/labproject/certificate?page=3&limit=2 (выведет количество значений в соответствии с defaultValue of limit)
+    @GetMapping (produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}) // с пагинацией
+    public List<GiftCertificateResponse> getCertificates(
+            @RequestParam(value = "page", defaultValue = "0") int page, //страницы начинаются с нуля
+            @RequestParam(value = "limit", defaultValue = "25") int limit
+    ){
+        List<GiftCertificateResponse> returnValue = new ArrayList<>();
+        List<GiftCertificateDTO> certificates = giftCertificateService.getCertificates(page, limit);
+
+        ModelMapper modelMapper = new ModelMapper();
+
+        for (GiftCertificateDTO certDTO : certificates){
+            GiftCertificateResponse certRespons = modelMapper.map(certDTO, GiftCertificateResponse.class);
+
+            //http://localhost:8080/labproject/certificate/{certificateId}
+            Link certificateLink = WebMvcLinkBuilder.linkTo(
+                    WebMvcLinkBuilder.methodOn(GiftCertificateController.class)
+                    .getCertificate(certRespons.getId()))
+                    .withRel("certificateRel");
+
+            returnValue.add(certRespons);
+            certRespons.add(certificateLink);
+        }
+        return returnValue;
+    }
+
 
 }

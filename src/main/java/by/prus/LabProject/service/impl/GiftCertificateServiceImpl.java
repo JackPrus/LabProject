@@ -12,7 +12,11 @@ import by.prus.LabProject.repository.CertificateTagRepository;
 import by.prus.LabProject.repository.GiftCertificateRepository;
 import by.prus.LabProject.service.GiftCertificateService;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -106,6 +110,24 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             returnValue.add(modelMapper.map(entity, GiftCertificateDTO.class));
         }
 
+        return returnValue;
+    }
+
+    //pagination in action
+    @Override
+    public List<GiftCertificateDTO> getCertificates(int page, int limit) {
+        List<GiftCertificateDTO> returnValue = new ArrayList<>();
+        if(page>0) { page = page-1;}
+        Pageable pageableRequest = PageRequest.of(page, limit); // объект который мы засунем в репозиторий, чтобы достать результат по страницам
+        Page<GiftCertificateEntity> certificatePage = giftCertificateRepository.findAll(pageableRequest); // находит нужную страницу юзеров
+        List<GiftCertificateEntity> users = certificatePage.getContent();
+
+        ModelMapper modelMapper = new ModelMapper();
+
+        for (GiftCertificateEntity certEntity : users) {
+            GiftCertificateDTO certDTO = modelMapper.map(certEntity, GiftCertificateDTO.class);
+            returnValue.add(certDTO);
+        }
         return returnValue;
     }
 

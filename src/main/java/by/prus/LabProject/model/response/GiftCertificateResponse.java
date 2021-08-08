@@ -4,6 +4,7 @@ import by.prus.LabProject.model.entity.TagEntity;
 import by.prus.LabProject.model.entity.supporting.CertificateTag;
 import org.apache.tomcat.jni.Local;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -11,7 +12,7 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.Set;
 
-public class GiftCertificateResponse implements Serializable {
+public class GiftCertificateResponse extends RepresentationModel<GiftCertificateResponse> implements Serializable {
 
     private static final long serialVersionUID = 2345356234623452346L;
 

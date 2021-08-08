@@ -2,11 +2,12 @@ package by.prus.LabProject.model.response;
 
 import by.prus.LabProject.model.entity.GiftCertificateEntity;
 import by.prus.LabProject.model.entity.supporting.CertificateTag;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serializable;
 import java.util.Set;
 
-public class TagResponse implements Serializable {
+public class TagResponse extends RepresentationModel<TagResponse> implements Serializable {
 
     private static final long serialVersionUID = 2344432456723452346L;
 
