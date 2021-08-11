@@ -2,34 +2,32 @@ package by.prus.LabProject.controller;
 
 import by.prus.LabProject.exception.CertificateServiceException;
 import by.prus.LabProject.model.dto.GiftCertificateDTO;
-import by.prus.LabProject.model.dto.TagDTO;
 import by.prus.LabProject.model.request.GiftCertificateRequest;
 import by.prus.LabProject.model.response.ErrorMessages;
 import by.prus.LabProject.model.response.GiftCertificateResponse;
 import by.prus.LabProject.model.response.OperationStatusModel;
 import by.prus.LabProject.service.GiftCertificateService;
-import jdk.dynalink.Operation;
+import by.prus.LabProject.service.relgenerator.LinkCreator;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("certificate")
+@RequestMapping("/certificate")
 //http://localhost:8080/labproject/certificate/
 public class GiftCertificateController {
 
     @Autowired
     GiftCertificateService giftCertificateService;
+    @Autowired
+    LinkCreator linkCreator;
 
     @PostMapping(
             produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}, // то что возвращает
@@ -62,6 +60,9 @@ public class GiftCertificateController {
 
         GiftCertificateDTO giftCertificateDTO = giftCertificateService.getCertificate(id);
         GiftCertificateResponse returnValue = modelMapper.map(giftCertificateDTO, GiftCertificateResponse.class);
+
+        //http://localhost:8080/labproject/certificate/{certificateId}
+        linkCreator.addLinkToCertificateResponse(returnValue);
 
         return returnValue;
     }
@@ -128,14 +129,14 @@ public class GiftCertificateController {
         return returnValue;
     }
 
-    //ПАГИНАЦИЯ
+    //ПАГИНАЦИЯ + hateoas ссылки
     //http://localhost:8080/labproject/certificate?page=3&limit=2 (выведет количество значений в соответствии с defaultValue of limit)
     @GetMapping (produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}) // с пагинацией
-    public List<GiftCertificateResponse> getCertificates(
+    public CollectionModel<GiftCertificateResponse> getCertificates(
             @RequestParam(value = "page", defaultValue = "0") int page, //страницы начинаются с нуля
             @RequestParam(value = "limit", defaultValue = "25") int limit
     ){
-        List<GiftCertificateResponse> returnValue = new ArrayList<>();
+        List<GiftCertificateResponse> responseValue = new ArrayList<>();
         List<GiftCertificateDTO> certificates = giftCertificateService.getCertificates(page, limit);
 
         ModelMapper modelMapper = new ModelMapper();
@@ -149,11 +150,13 @@ public class GiftCertificateController {
                     .getCertificate(certRespons.getId()))
                     .withRel("certificateRel");
 
-            returnValue.add(certRespons);
             certRespons.add(certificateLink);
+            responseValue.add(certRespons);
         }
+
+        CollectionModel<GiftCertificateResponse> returnValue = linkCreator.getNavigationCertLinks(responseValue, page, limit);
+
         return returnValue;
     }
-
 
 }

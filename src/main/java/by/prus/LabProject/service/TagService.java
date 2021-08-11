@@ -12,5 +12,6 @@ public interface TagService {
     TagDTO updateTag(Long tagId, TagDTO tagDTO);
     void deleteTag(Long tagId);
     List<TagDTO> findTagByNamePart(String partOfName);
+    List<TagDTO> getTags(int page,int limit);
 
 }

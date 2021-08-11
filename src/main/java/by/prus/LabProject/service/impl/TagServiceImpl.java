@@ -12,6 +12,9 @@ import by.prus.LabProject.repository.TagRepository;
 import by.prus.LabProject.service.TagService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
@@ -91,6 +94,23 @@ public class TagServiceImpl implements TagService {
             returnValue.add(modelMapper.map(entity, TagDTO.class));
         }
 
+        return returnValue;
+    }
+
+    @Override
+    public List<TagDTO> getTags(int page, int limit) {
+        List<TagDTO> returnValue = new ArrayList<>();
+        if(page>0) { page = page-1;}
+        Pageable pageableRequest = PageRequest.of(page, limit); // объект который мы засунем в репозиторий, чтобы достать результат по страницам
+        Page<TagEntity> tagPage = tagRepository.findAll(pageableRequest); // находит нужную страницу юзеров
+        List<TagEntity> tags = tagPage.getContent();
+
+        ModelMapper modelMapper = new ModelMapper();
+
+        for (TagEntity tagEntity : tags) {
+            TagDTO tagDTO = modelMapper.map(tagEntity, TagDTO.class);
+            returnValue.add(tagDTO);
+        }
         return returnValue;
     }
 

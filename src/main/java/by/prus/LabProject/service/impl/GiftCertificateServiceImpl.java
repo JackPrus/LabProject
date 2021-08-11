@@ -120,11 +120,11 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         if(page>0) { page = page-1;}
         Pageable pageableRequest = PageRequest.of(page, limit); // объект который мы засунем в репозиторий, чтобы достать результат по страницам
         Page<GiftCertificateEntity> certificatePage = giftCertificateRepository.findAll(pageableRequest); // находит нужную страницу юзеров
-        List<GiftCertificateEntity> users = certificatePage.getContent();
+        List<GiftCertificateEntity> certificates = certificatePage.getContent();
 
         ModelMapper modelMapper = new ModelMapper();
 
-        for (GiftCertificateEntity certEntity : users) {
+        for (GiftCertificateEntity certEntity : certificates) {
             GiftCertificateDTO certDTO = modelMapper.map(certEntity, GiftCertificateDTO.class);
             returnValue.add(certDTO);
         }

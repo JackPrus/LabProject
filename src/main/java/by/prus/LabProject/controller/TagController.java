@@ -10,8 +10,11 @@ import by.prus.LabProject.model.response.GiftCertificateResponse;
 import by.prus.LabProject.model.response.OperationStatusModel;
 import by.prus.LabProject.model.response.TagResponse;
 import by.prus.LabProject.service.TagService;
+import by.prus.LabProject.service.relgenerator.LinkCreator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.ui.ModelMap;
@@ -22,12 +25,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping ("tag")
+@RequestMapping ("/tag")
 //http://localhost:8080/labproject/tag/
 public class TagController {
 
     @Autowired
     TagService tagService;
+    @Autowired
+    LinkCreator linkCreator;
 
     @PostMapping(
             produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
@@ -60,6 +65,7 @@ public class TagController {
         TagDTO tagDTO = tagService.getTag(id);
 
         TagResponse returnValue = modelMapper.map(tagDTO, TagResponse.class);
+        linkCreator.addLinkToTagResponse(returnValue);
 
         return returnValue;
     }
@@ -112,5 +118,32 @@ public class TagController {
         }
         return returnValue;
     }
+
+    //ПАГИНАЦИЯ + hateoas ссылки
+    //http://localhost:8080/labproject/tag?page=3&limit=2 (выведет количество значений в соответствии с defaultValue of limit)
+    @GetMapping (produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}) // с пагинацией
+    public CollectionModel<TagResponse> getTags(
+            @RequestParam(value = "page", defaultValue = "0") int page, //страницы начинаются с нуля
+            @RequestParam(value = "limit", defaultValue = "25") int limit
+    ){
+        List<TagResponse> responseValue = new ArrayList<>();
+        List<TagDTO> tags = tagService.getTags(page, limit);
+
+        ModelMapper modelMapper = new ModelMapper();
+
+        for (TagDTO tagDTO : tags){
+            TagResponse tagResponse = modelMapper.map(tagDTO, TagResponse.class);
+
+            //http://localhost:8080/labproject/certificate/{certificateId}
+            linkCreator.addLinkToTagResponse(tagResponse);
+            responseValue.add(tagResponse);
+        }
+
+        CollectionModel<TagResponse> returnValue = linkCreator.getNavigationTagLinks(responseValue, page, limit);
+
+        return returnValue;
+    }
+
+
 
 }
