@@ -15,6 +15,9 @@ import by.prus.LabProject.service.CertificateTagService;
 import by.prus.LabProject.service.GiftCertificateService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -74,10 +77,13 @@ public class CertificateTagServiceImpl implements CertificateTagService {
     }
 
     @Override
-    public List<GiftCertificateDTO> findCertificatesByTagName(String tagName) {
+    public List<GiftCertificateDTO> findCertificatesByTagName(String tagName, int page, int limit) {
 
         List<GiftCertificateDTO> returnValue = new ArrayList<>();
-        List<TagEntity> tagEntityList = tagRepository.findTagsByNamePart(tagName);
+        if (page>0) {page = page-1;}
+        Pageable pageableRequest = PageRequest.of(page,limit);
+        Page<TagEntity> tagPage = tagRepository.findTagsByNamePartAbdReturnPage(tagName, pageableRequest);
+        List<TagEntity> tagEntityList = tagPage.getContent();
         ModelMapper modelMapper = new ModelMapper();
 
         for (TagEntity tag : tagEntityList){

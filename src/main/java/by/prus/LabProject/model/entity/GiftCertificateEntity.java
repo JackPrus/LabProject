@@ -3,8 +3,6 @@ package by.prus.LabProject.model.entity;
 
 import by.prus.LabProject.model.entity.supporting.CertificateTag;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.aspectj.apache.bcel.generic.Tag;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -13,8 +11,6 @@ import javax.validation.constraints.Min;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -57,15 +53,10 @@ public class GiftCertificateEntity implements Serializable {
     @OneToMany(mappedBy = "giftCertificate", cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
     private Set<CertificateTag> certificateTags;
 
-    /*
-    @ManyToMany
-    @JoinTable(
-                name = "certificate_tag",
-            joinColumns = @JoinColumn (name = "gift_certificate_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id")
-            )
-    Set<TagEntity> tagSet = new HashSet<>();
+    @ManyToMany(mappedBy = "certificatesOfUser")
+    private Set<UserEntity> usersOfCertificate;
 
+    /*
     Many to many examples
     https://github.com/kriscfoster/Spring-Data-JPA-Relationships/blob/c8d46448d5f433ca783db64694c215824995bc52/src/main/java/com/kriscfoster/school/student/Student.java#L11
     https://github.com/bartoszkomin/hibernate-many-to-many-demo/blob/master/src/main/java/com/blogspot/bartoszkomin/hibernate_many_to_many_demo/model/User.java
@@ -87,4 +78,7 @@ public class GiftCertificateEntity implements Serializable {
     public void setLastUpdateDate(LocalDate lastUpdateDate) { this.lastUpdateDate = lastUpdateDate; }
     public Set<CertificateTag> getCertificateTags() { return certificateTags; }
     public void setCertificateTags(Set<CertificateTag> certificateTags) { this.certificateTags = certificateTags; }
+    public Set<UserEntity> getUsersOfCertificate() { return usersOfCertificate; }
+    public void setUsersOfCertificate(Set<UserEntity> usersOfCertificate) { this.usersOfCertificate = usersOfCertificate; }
+
 }

@@ -7,12 +7,15 @@ import by.prus.LabProject.model.response.TagResponse;
 import by.prus.LabProject.service.CertificateTagService;
 import by.prus.LabProject.service.GiftCertificateService;
 import by.prus.LabProject.service.TagService;
+import by.prus.LabProject.service.relgenerator.LinkCreator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +29,8 @@ public class CertificateTagController {
     TagService tagService;
     @Autowired
     CertificateTagService certificateTagService;
+    @Autowired
+    LinkCreator linkCreator;
 
     @PutMapping(
             path = "certificate/{certificateId}/tag/{tagId}",
@@ -58,18 +63,24 @@ public class CertificateTagController {
     }
 
     @GetMapping(
-            path = "certificate/search/byTag/{tagName}",
+            path = "certificate/search/byTag/{tagName}/{page}/{limit}",
             produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
     )
-    public List<GiftCertificateResponse> findCertificatesByTag(@PathVariable String tagName){
+    public CollectionModel<GiftCertificateResponse> findCertificatesByTag(
+            @PathVariable String tagName,
+            @PathVariable int page,
+            @PathVariable int limit
+    ){
 
-        List<GiftCertificateDTO> certificatesDTO = certificateTagService.findCertificatesByTagName(tagName);
-        List <GiftCertificateResponse> returnValue = new ArrayList<>();
+        List<GiftCertificateDTO> certificatesDTO = certificateTagService.findCertificatesByTagName(tagName, page, limit);
+        List <GiftCertificateResponse> certValue = new ArrayList<>();
         ModelMapper modelMapper = new ModelMapper();
 
         for (GiftCertificateDTO gcDTO : certificatesDTO){
-            returnValue.add(modelMapper.map(gcDTO, GiftCertificateResponse.class));
+            certValue.add(modelMapper.map(gcDTO, GiftCertificateResponse.class));
         }
+        CollectionModel<GiftCertificateResponse> returnValue = linkCreator.getNavigationCertSearchByTagLinks(certValue, tagName, page,limit);
+
         return returnValue;
     }
 

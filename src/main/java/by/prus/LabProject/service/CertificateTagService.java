@@ -8,5 +8,5 @@ import java.util.List;
 public interface CertificateTagService {
     GiftCertificateDTO addTagToCertificate(Long certificateId, Long tagId);
     TagDTO addCertificateToTag(Long tagId, Long certificateId);
-    List<GiftCertificateDTO> findCertificatesByTagName(String tagName);
+    List<GiftCertificateDTO> findCertificatesByTagName(String tagName, int page, int limit);
 }

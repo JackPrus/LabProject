@@ -1,5 +1,6 @@
 package by.prus.LabProject.service.relgenerator;
 
+import by.prus.LabProject.controller.CertificateTagController;
 import by.prus.LabProject.controller.GiftCertificateController;
 import by.prus.LabProject.controller.TagController;
 import by.prus.LabProject.model.response.GiftCertificateResponse;
@@ -37,7 +38,6 @@ public class LinkCreator {
         }
 
         return returnValue;
-
     }
 
     public CollectionModel<TagResponse> getNavigationTagLinks(Collection<TagResponse> workValue, int page, int limit){
@@ -62,6 +62,31 @@ public class LinkCreator {
         }
         return returnValue;
     }
+
+    public CollectionModel<GiftCertificateResponse> getNavigationCertSearchByTagLinks(Collection<GiftCertificateResponse> workValue, String tagName, int page, int limit){
+
+        CollectionModel<GiftCertificateResponse> returnValue = CollectionModel.of(workValue);
+
+        //если последняя страница - то не будет ссылки на следующую страницу
+        if (workValue.size()>=limit){
+            Link nextPage = WebMvcLinkBuilder.linkTo(
+                    WebMvcLinkBuilder.methodOn(CertificateTagController.class)
+                            .findCertificatesByTag(tagName, page+1, limit))
+                    .withRel("nextPageRel");
+            returnValue.add(nextPage);
+        }
+        //если первая страница не будет ссылки на предыдущую страницу
+        if (page>1){
+            Link previousPage = WebMvcLinkBuilder.linkTo(
+                    WebMvcLinkBuilder.methodOn(CertificateTagController.class)
+                            .findCertificatesByTag(tagName,page-1, limit))
+                    .withRel("previousPageRel");
+            returnValue.add(previousPage);
+        }
+
+        return returnValue;
+    }
+
 
     public void addLinkToCertificateResponse(GiftCertificateResponse certResponse){
         Link tagLink = WebMvcLinkBuilder.linkTo(

@@ -2,6 +2,8 @@ package by.prus.LabProject.repository;
 
 import by.prus.LabProject.model.entity.GiftCertificateEntity;
 import by.prus.LabProject.model.entity.TagEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -30,5 +32,8 @@ public interface TagRepository extends PagingAndSortingRepository<TagEntity, Lon
 
     @Query(value="select * from tag gc where name LIKE %:namePart%",nativeQuery=true)
     List<TagEntity> findTagsByNamePart(@Param("namePart") String partOfName);
+
+    @Query(value="select * from tag gc where name LIKE %:namePart%",nativeQuery=true)
+    Page<TagEntity> findTagsByNamePartAbdReturnPage(@Param("namePart") String partOfName, Pageable pageAble);
 
 }
