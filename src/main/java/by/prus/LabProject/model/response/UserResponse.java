@@ -1,11 +1,12 @@
 package by.prus.LabProject.model.response;
 
 import by.prus.LabProject.model.dto.GiftCertificateDTO;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.util.List;
 import java.util.Set;
 
-public class UserResponse {
+public class UserResponse extends RepresentationModel<UserResponse> {
 
     private String userId;
     private String email;

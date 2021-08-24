@@ -53,6 +53,7 @@ public class GiftCertificateEntity implements Serializable {
     @OneToMany(mappedBy = "giftCertificate", cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
     private Set<CertificateTag> certificateTags;
 
+    @JsonBackReference
     @ManyToMany(mappedBy = "certificatesOfUser")
     private Set<UserEntity> usersOfCertificate;
 

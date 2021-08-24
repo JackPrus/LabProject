@@ -143,14 +143,7 @@ public class GiftCertificateController {
 
         for (GiftCertificateDTO certDTO : certificates){
             GiftCertificateResponse certRespons = modelMapper.map(certDTO, GiftCertificateResponse.class);
-
-            //http://localhost:8080/labproject/certificate/{certificateId}
-            Link certificateLink = WebMvcLinkBuilder.linkTo(
-                    WebMvcLinkBuilder.methodOn(GiftCertificateController.class)
-                    .getCertificate(certRespons.getId()))
-                    .withRel("certificateRel");
-
-            certRespons.add(certificateLink);
+            linkCreator.addLinkToCertificateResponse(certRespons);
             responseValue.add(certRespons);
         }
 

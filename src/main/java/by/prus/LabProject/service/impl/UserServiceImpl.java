@@ -4,8 +4,10 @@ import by.prus.LabProject.exception.UserServiceException;
 import by.prus.LabProject.model.Role;
 import by.prus.LabProject.model.dto.GiftCertificateDTO;
 import by.prus.LabProject.model.dto.UserDto;
+import by.prus.LabProject.model.entity.GiftCertificateEntity;
 import by.prus.LabProject.model.entity.RoleEntity;
 import by.prus.LabProject.model.entity.UserEntity;
+import by.prus.LabProject.model.response.ErrorMessages;
 import by.prus.LabProject.repository.RoleRepository;
 import by.prus.LabProject.repository.UserRepository;
 import by.prus.LabProject.security.UserPrincipal;
@@ -14,16 +16,16 @@ import by.prus.LabProject.service.Utils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -79,22 +81,50 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserByUserId(String userId) {
-        return null;
+        UserEntity userEntity = userRepository.findByUserId(userId);
+        if (userEntity == null){ throw new UsernameNotFoundException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage()); }
+        ModelMapper modelMapper = new ModelMapper();
+        return modelMapper.map(userEntity, UserDto.class);
     }
 
+    //update set of certificates only
     @Override
     public UserDto updateUser(String userId, UserDto user) {
-        return null;
+        UserEntity userEntity = userRepository.findByUserId(userId);
+        ModelMapper modelMapper = new ModelMapper();
+        Set<GiftCertificateEntity> certificateEntitySet = new HashSet<>();
+
+        if (userEntity == null){ throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage()); }
+
+        for (GiftCertificateDTO certificate : user.getCertificates()){
+            certificateEntitySet.add(modelMapper.map(certificate, GiftCertificateEntity.class));
+        }
+        userEntity.setCertificatesOfUser(certificateEntitySet);
+        UserEntity updatedUserDetails = userRepository.save(userEntity);
+
+        return modelMapper.map(updatedUserDetails, UserDto.class);
     }
 
     @Override
     public void deleteUser(String userId) {
-
+        UserEntity userEntity = userRepository.findByUserId(userId);
+        if (userEntity == null){throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());}
+        userRepository.delete(userEntity);
     }
 
     @Override
     public List<UserDto> getUsers(int page, int limit) {
-        return null;
+        List<UserDto> returnValue = new ArrayList<>();
+        if(page>0) { page = page-1;}
+        Pageable pageableRequest = PageRequest.of(page, limit); // объект который мы засунем в репозиторий, чтобы достать результат по страницам
+        Page<UserEntity> userPage = userRepository.findAllAndSortByEmail(pageableRequest); // находит нужную страницу юзеров
+        List<UserEntity> users = userPage.getContent();
+        ModelMapper modelMapper = new ModelMapper();
+
+        for (UserEntity userEntity : users) {
+            returnValue.add(modelMapper.map(userEntity, UserDto.class));
+        }
+        return returnValue;
     }
 
     @Override
@@ -131,20 +161,6 @@ public class UserServiceImpl implements UserService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         UserEntity userEntity = userRepository.findByEmail(email);
         if (userEntity == null){ throw new UsernameNotFoundException(email); }
-
         return new UserPrincipal(userEntity);
-
-
-//        String login = userEntity.getEmail();
-//        String password = userEntity.getEncryptedPassword();
-//        boolean verfifcationStatus = userEntity.getEmailVerificationStatus();
-//
-//        return new User(
-//                email, password, verfifcationStatus,
-//                true,true, true,
-//                new ArrayList<>());
-//
-//        return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), new ArrayList<>());
-
     }
 }

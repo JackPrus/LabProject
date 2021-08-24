@@ -1,5 +1,7 @@
 package by.prus.LabProject.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
@@ -42,6 +44,7 @@ public class UserEntity implements Serializable {
     private Collection<RoleEntity> rolesOfUser;
 
     @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
+    @JsonManagedReference
     @JoinTable(
             name ="user_gift_certificate",
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),

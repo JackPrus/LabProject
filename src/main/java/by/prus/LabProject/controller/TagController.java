@@ -133,8 +133,6 @@ public class TagController {
 
         for (TagDTO tagDTO : tags){
             TagResponse tagResponse = modelMapper.map(tagDTO, TagResponse.class);
-
-            //http://localhost:8080/labproject/certificate/{certificateId}
             linkCreator.addLinkToTagResponse(tagResponse);
             responseValue.add(tagResponse);
         }
