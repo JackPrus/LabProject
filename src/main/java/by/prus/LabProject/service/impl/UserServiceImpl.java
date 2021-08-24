@@ -8,15 +8,19 @@ import by.prus.LabProject.model.entity.RoleEntity;
 import by.prus.LabProject.model.entity.UserEntity;
 import by.prus.LabProject.repository.RoleRepository;
 import by.prus.LabProject.repository.UserRepository;
+import by.prus.LabProject.security.UserPrincipal;
 import by.prus.LabProject.service.UserService;
 import by.prus.LabProject.service.Utils;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -67,7 +71,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUser(String email) {
-        return null;
+        UserEntity userEntity = userRepository.findByEmail(email);
+        if (userEntity == null){ throw new UsernameNotFoundException(email); }
+        ModelMapper modelMapper = new ModelMapper();
+        return modelMapper.map(userEntity, UserDto.class);
     }
 
     @Override
@@ -92,7 +99,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean verifyEmailToken(String token) {
-        return false;
+
+        boolean returnValue = false;
+        //Find user by token
+        UserEntity userEntity = userRepository.findByEmailVerificationToken(token);
+
+        if (userEntity!=null){
+            boolean hasTokenExpired = Utils.hasTokenExpired(token);
+            if (!hasTokenExpired){
+                userEntity.setEmailVerificationToken(null);
+                userEntity.setEmailVerificationStatus(Boolean.TRUE);
+                userRepository.save(userEntity);
+                returnValue = true;
+            }
+        }
+
+        return returnValue;
     }
 
     @Override
@@ -106,7 +128,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        return null;
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        UserEntity userEntity = userRepository.findByEmail(email);
+        if (userEntity == null){ throw new UsernameNotFoundException(email); }
+
+        return new UserPrincipal(userEntity);
+
+
+//        String login = userEntity.getEmail();
+//        String password = userEntity.getEncryptedPassword();
+//        boolean verfifcationStatus = userEntity.getEmailVerificationStatus();
+//
+//        return new User(
+//                email, password, verfifcationStatus,
+//                true,true, true,
+//                new ArrayList<>());
+//
+//        return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), new ArrayList<>());
+
     }
 }

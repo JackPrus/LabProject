@@ -1,6 +1,7 @@
 package by.prus.LabProject.service;
 
 import by.prus.LabProject.model.dto.UserDto;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;
