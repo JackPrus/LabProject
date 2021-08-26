@@ -18,7 +18,7 @@ public class UserEntity implements Serializable {
     @GeneratedValue
     private long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String userId;
 
     @Column(nullable = false, length = 120, unique = true)
@@ -36,6 +36,7 @@ public class UserEntity implements Serializable {
     //Persist - если Юзер будет удален, нам не нужно удалять роль, т.к. роль принадлежит разным юзерам.
     // Eager - когда данные юзера будут считаны из базы данных, роли будут загружены сразу же. Это нужно для аутентификации
     @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
+    @JsonManagedReference
     @JoinTable(
             name ="user_role",
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),

@@ -57,7 +57,7 @@ public class Utils {
                     .getBody();
             Date tokenExpirationDate = claims.getExpiration();
             Date todayDate = new Date();
-            returnValue = tokenExpirationDate.before(todayDate);
+            returnValue = tokenExpirationDate.before(todayDate); // сегодня ли создан токен
         } catch (ExpiredJwtException ex) { returnValue = true; }
         return returnValue;
     }

@@ -91,6 +91,13 @@
 			<version>0.9.1</version>
 		</dependency>
 
+		<!-- для отсылки email при верификации и password reset -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+
+
 
 
 	</dependencies>

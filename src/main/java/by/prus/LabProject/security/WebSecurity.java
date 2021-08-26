@@ -51,8 +51,9 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 .addFilter(getAutentificationFilter())
                 .addFilter(new AuthorizationFilter(authenticationManager(),userRepository))
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        ;
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+        http.headers().frameOptions().disable();
     }
 
     @Override
@@ -75,7 +76,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 "/configuration/security",
                 "/swagger-ui.html",
                 "/webjars/**",
-                "/user/**",
+                //"/user/**",
                 "/tag/**",
                 "/certificate/**"
                 );

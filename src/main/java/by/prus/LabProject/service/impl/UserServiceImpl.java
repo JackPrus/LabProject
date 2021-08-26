@@ -1,25 +1,23 @@
 package by.prus.LabProject.service.impl;
 
 import by.prus.LabProject.exception.UserServiceException;
-import by.prus.LabProject.model.Role;
 import by.prus.LabProject.model.dto.GiftCertificateDTO;
 import by.prus.LabProject.model.dto.UserDto;
-import by.prus.LabProject.model.entity.GiftCertificateEntity;
-import by.prus.LabProject.model.entity.RoleEntity;
-import by.prus.LabProject.model.entity.UserEntity;
+import by.prus.LabProject.model.entity.*;
 import by.prus.LabProject.model.response.ErrorMessages;
+import by.prus.LabProject.repository.PasswordResetTokenRepository;
 import by.prus.LabProject.repository.RoleRepository;
 import by.prus.LabProject.repository.UserRepository;
 import by.prus.LabProject.security.UserPrincipal;
 import by.prus.LabProject.service.UserService;
 import by.prus.LabProject.service.Utils;
+import by.prus.LabProject.service.mail.MailSender;
+import by.prus.LabProject.service.mail.YandexSES;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -38,9 +36,16 @@ public class UserServiceImpl implements UserService {
     RoleRepository roleRepository;
     @Autowired
     Utils utils;
+    @Autowired
+    PasswordResetTokenRepository passwordResetTokenRepository;
+    @Autowired
+    MailSender mailSender;
+    @Autowired
+    YandexSES yandexSES;
 
     @Override
     public UserDto createUser(UserDto userDto) {
+
         UserEntity storedUserDetails = userRepository.findByEmail(userDto.getEmail());
         if (storedUserDetails!=null){ throw new UserServiceException("record already exists"); }
 
@@ -66,7 +71,7 @@ public class UserServiceImpl implements UserService {
         UserDto returnValue = modelMapper.map(storedUserDetails, UserDto.class);
 
         //Send an email message to verify their email address
-        //amazonSes.verifyEmail(returnValue);
+        yandexSES.verifyEmail(returnValue);
 
         return returnValue;
     }
@@ -149,12 +154,54 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean requestPasswordReset(String email) {
-        return false;
+        boolean returnValue = false;
+        UserEntity userEntity = userRepository.findByEmail(email);
+        if (userEntity==null){return  returnValue;}
+        String token = new Utils().generatePasswordResetToken(userEntity.getUserId());
+
+        PasswordResetTokenEntity passwordResetTokenEntity = new PasswordResetTokenEntity();
+        passwordResetTokenEntity.setToken(token);
+        passwordResetTokenEntity.setUserDetails(userEntity);
+        passwordResetTokenRepository.save(passwordResetTokenEntity);
+
+//        returnValue = amazonSes.sendPasswordResetRequest(
+//                userEntity.getFirstName(),
+//                userEntity.getEmail(),
+//                token);
+        returnValue = yandexSES.sendPasswordResetRequest(userEntity.getEmail(), token);
+
+        return returnValue;
     }
 
     @Override
     public boolean resetPassword(String token, String password) {
-        return false;
+        boolean returnValue = false;
+
+        if( Utils.hasTokenExpired(token) ) {
+            return returnValue;
+        }
+
+        PasswordResetTokenEntity passwordResetTokenEntity = passwordResetTokenRepository.findByToken(token);
+
+        if (passwordResetTokenEntity == null) {
+            return returnValue;
+        }
+
+        String encodedPassword = bCryptPasswordEncoder.encode(password);
+
+        // Update User password in database
+        UserEntity userEntity = passwordResetTokenEntity.getUserDetails();
+        userEntity.setEncryptedPassword(encodedPassword);
+        UserEntity savedUserEntity = userRepository.save(userEntity);
+
+        // Verify if password was saved successfully
+        if (savedUserEntity != null && savedUserEntity.getEncryptedPassword().equalsIgnoreCase(encodedPassword)) {
+            returnValue = true;
+        }
+        // удаляем пассворд ресет токен из базы данных
+        passwordResetTokenRepository.delete(passwordResetTokenEntity);
+
+        return returnValue;
     }
 
     @Override

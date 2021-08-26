@@ -4,21 +4,19 @@ import by.prus.LabProject.exception.UserServiceException;
 import by.prus.LabProject.model.Role;
 import by.prus.LabProject.model.dto.GiftCertificateDTO;
 import by.prus.LabProject.model.dto.UserDto;
+import by.prus.LabProject.model.request.PasswordResetModel;
+import by.prus.LabProject.model.request.PasswordResetRequestModel;
+import by.prus.LabProject.model.request.RequestOperationName;
 import by.prus.LabProject.model.request.UserRequest;
-import by.prus.LabProject.model.response.ErrorMessages;
-import by.prus.LabProject.model.response.GiftCertificateResponse;
-import by.prus.LabProject.model.response.OperationStatusModel;
-import by.prus.LabProject.model.response.UserResponse;
+import by.prus.LabProject.model.response.*;
 import by.prus.LabProject.service.GiftCertificateService;
 import by.prus.LabProject.service.UserService;
 import by.prus.LabProject.service.relgenerator.LinkCreator;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -117,32 +115,37 @@ public class UserController {
     Выполнится верификация. И в базе данных верификейшнтокен исчезнет, а на месте
     email-verification-status будет 1, что соответствует верифицированному пользователю.
      */
-    @GetMapping(path = "/email-verification", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_ATOM_XML_VALUE})
+    @GetMapping(path = "/email-verification",
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_ATOM_XML_VALUE}
+            )
     public OperationStatusModel verifyEmailToken(@RequestParam(value = "token") String token){
         OperationStatusModel returnValue = new OperationStatusModel();
-        returnValue.setOperationName("verify email");
+        returnValue.setOperationName(RequestOperationName.VERIFY_EMAIL.name());
         boolean isVerified = userService.verifyEmailToken(token);
 
         if (isVerified){
-            returnValue.setOperationResult("verifyed successfully");
+            returnValue.setOperationResult(ResponseOperationStatus.SUCCESS.name());
         }else {
-            returnValue.setOperationResult("email verification error");
+            returnValue.setOperationResult(ResponseOperationStatus.ERROR.name());
         }
 
         return returnValue;
     }
 
+    // #id == principal.id говорит о том, что юзер может удалить сам себя но не другого юзера.
+    @PreAuthorize("hasRole('ROLE_ADMIN') or #userId == principal.userId")
     @DeleteMapping (
             path = "/{userId}",
             produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
     )
     public OperationStatusModel deleteUser(@PathVariable String userId){
         OperationStatusModel returnValue = new OperationStatusModel();
-        returnValue.setOperationName("Delete of user");
+        returnValue.setOperationName(RequestOperationName.DELETE.name());
+        returnValue.setOperationResult(ResponseOperationStatus.ERROR.name());
 
         userService.deleteUser(userId);
 
-        returnValue.setOperationResult("User deleted successfully");
+        returnValue.setOperationResult(ResponseOperationStatus.SUCCESS.name());
         return returnValue;
     }
 
@@ -164,6 +167,50 @@ public class UserController {
         }
 
         CollectionModel<UserResponse> returnValue = linkCreator.getNavigationUserLinks(responseValue, page,limit);
+
+        return returnValue;
+    }
+
+    /**
+     * http://localhost:8080/labproject/user/password-reset-request/
+     */
+
+    @PostMapping(
+            path = "/password-reset-request",
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
+    )
+    public OperationStatusModel requestReset(
+            @RequestBody PasswordResetRequestModel passwordResetRequestModel){
+
+        OperationStatusModel returnValue = new OperationStatusModel();
+        boolean operationResult = userService.requestPasswordReset(passwordResetRequestModel.getEmail());
+
+        returnValue.setOperationName(RequestOperationName.REQUEST_PASSWORD_RESET.name());
+        returnValue.setOperationResult(ResponseOperationStatus.ERROR.name());
+
+        if (operationResult){
+            returnValue.setOperationResult(ResponseOperationStatus.SUCCESS.name());
+        }
+        return returnValue;
+    }
+
+    @PostMapping(path = "/password-reset",
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
+    )
+    public OperationStatusModel resetPassword(@RequestBody PasswordResetModel passwordResetModel) {
+        OperationStatusModel returnValue = new OperationStatusModel();
+
+        boolean operationResult = userService.resetPassword(
+                passwordResetModel.getToken(),
+                passwordResetModel.getPassword());
+
+        returnValue.setOperationName(RequestOperationName.PASSWORD_RESET.name());
+        returnValue.setOperationResult(ResponseOperationStatus.ERROR.name());
+
+        if(operationResult) {
+            returnValue.setOperationResult(ResponseOperationStatus.SUCCESS.name());
+        }
 
         return returnValue;
     }

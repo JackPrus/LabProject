@@ -1,5 +1,7 @@
 package by.prus.LabProject.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
@@ -17,6 +19,7 @@ public class AuthorityEntity implements Serializable {
     private String name;
 
     @ManyToMany(mappedBy = "authoritiesOfRole")
+    @JsonBackReference
     Collection<RoleEntity> roles;
 
     public AuthorityEntity(){}

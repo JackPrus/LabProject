@@ -6,6 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.servlet.ViewResolver;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 @SpringBootApplication
 public class LabProjectApplication extends SpringBootServletInitializer {
@@ -25,5 +27,6 @@ public class LabProjectApplication extends SpringBootServletInitializer {
 
 	@Bean(name = "AppProperties")
 	public AppProperties appProperties () {return new AppProperties();}
+
 
 }

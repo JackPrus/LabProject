@@ -1,5 +1,8 @@
 package by.prus.LabProject.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
@@ -18,11 +21,13 @@ public class RoleEntity implements Serializable {
     private String name;
 
     @ManyToMany(mappedBy = "rolesOfUser")
+    @JsonBackReference
     private Collection<UserEntity> users;
 
     //Persist - если Юзер будет удален, нам не нужно удалять роль, т.к. роль принадлежит разным юзерам.
     // Eager - когда UserDetails будет считан из базы данных, роли будут загружены сразу же. Это нужно для аутентификации
     @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
+    @JsonManagedReference
     @JoinTable(
             name ="role_authority",
             joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),
