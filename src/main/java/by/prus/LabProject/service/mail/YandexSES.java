@@ -10,9 +10,6 @@ public class YandexSES {
     @Autowired
     MailSender mailSender;
 
-    //Address will be verified with AmazonSES
-    final String FROM = "jeakkey@yandex.ru";
-
     //the subject line for the email
     final String EMAIL_VERIFICATION_SUBJECT = "One last step to complete your registration with LabProject";
     final String PASSWORD_RESET_SUBJECT = "Password reset request";

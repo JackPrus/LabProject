@@ -13,6 +13,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Method;
@@ -32,6 +33,7 @@ public class CertificateTagController {
     @Autowired
     LinkCreator linkCreator;
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping(
             path = "certificate/{certificateId}/tag/{tagId}",
             produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
@@ -47,6 +49,7 @@ public class CertificateTagController {
         return returnValue;
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping(
             path = "tag/{tagId}/certificate/{certificateId}",
             produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}

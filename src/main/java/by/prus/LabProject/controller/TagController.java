@@ -4,11 +4,9 @@ import by.prus.LabProject.exception.TagServiceException;
 import by.prus.LabProject.model.dto.GiftCertificateDTO;
 import by.prus.LabProject.model.dto.TagDTO;
 import by.prus.LabProject.model.entity.TagEntity;
+import by.prus.LabProject.model.request.RequestOperationName;
 import by.prus.LabProject.model.request.TagRequest;
-import by.prus.LabProject.model.response.ErrorMessages;
-import by.prus.LabProject.model.response.GiftCertificateResponse;
-import by.prus.LabProject.model.response.OperationStatusModel;
-import by.prus.LabProject.model.response.TagResponse;
+import by.prus.LabProject.model.response.*;
 import by.prus.LabProject.service.TagService;
 import by.prus.LabProject.service.relgenerator.LinkCreator;
 import org.modelmapper.ModelMapper;
@@ -17,6 +15,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,10 +33,12 @@ public class TagController {
     @Autowired
     LinkCreator linkCreator;
 
+
     @PostMapping(
             produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
     )
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public TagResponse createTag (@RequestBody TagRequest tagRequest){
 
         TagResponse returnValue = new TagResponse();
@@ -70,11 +71,13 @@ public class TagController {
         return returnValue;
     }
 
+
     @PutMapping(
             path = "{tagId}",
             produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
     )
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public TagResponse updateTag (@PathVariable Long tagId, @RequestBody TagRequest tagRequest){
 
         if (tagRequest.getName().isEmpty()){
@@ -94,13 +97,14 @@ public class TagController {
             path = "{tagId}",
             produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
     )
-    public OperationStatusModel deleteCertificate (@PathVariable Long tagId){
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public OperationStatusModel deleteTag (@PathVariable Long tagId){
 
         OperationStatusModel returnValue = new OperationStatusModel();
-        returnValue.setOperationName("Delete of Tag with Id: " +tagId);
+        returnValue.setOperationName(RequestOperationName.DELETE.name());
 
         tagService.deleteTag(tagId);
-        returnValue.setOperationResult("Status : Deleted successfuly");
+        returnValue.setOperationResult(ResponseOperationStatus.SUCCESS.name());
         return returnValue;
     }
 

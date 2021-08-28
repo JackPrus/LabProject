@@ -1,6 +1,8 @@
 package by.prus.LabProject.repository;
 
 import by.prus.LabProject.model.entity.GiftCertificateEntity;
+import by.prus.LabProject.model.entity.TagEntity;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -23,6 +25,9 @@ public interface GiftCertificateRepository extends PagingAndSortingRepository<Gi
     @Query(value="delete ct.*, gc.* from certificate_tag ct LEFT JOIN  gift_certificate gc ON gc.id=ct.tag_id where ct.tag_id =?1", nativeQuery=true)
     void deleteCertificate(Long certificateId);
 
-    @Query(value="select * from gift_certificate gc where name LIKE %:namePart%",nativeQuery=true)
+    @Query(value="select * from gift_certificate gc  where name LIKE %:namePart%",nativeQuery=true)
     List<GiftCertificateEntity> findCertificatesByNamePart(@Param("namePart") String partOfName);
+
+    @Query(value="select * from gift_certificate  where name LIKE %:namePart%",nativeQuery=true)
+    List<GiftCertificateEntity> findCertificatesByNamePartAndReturnPage(@Param("namePart") String partOfName, Pageable pageAble);
 }

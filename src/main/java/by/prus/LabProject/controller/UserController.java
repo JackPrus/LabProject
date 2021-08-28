@@ -16,6 +16,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,23 +34,20 @@ public class UserController {
     @Autowired
     LinkCreator linkCreator;
 
+    @PostAuthorize("hasRole('ROLE_ADMIN') or #userId == principal.userId")
     @GetMapping(
-            path = "/{id}",
+            path = "/{userId}",
             produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
     )
-    //produces возвращает XML и JSON представление. По дефолту XML т.к. стоит первым тут
-    public UserResponse getUser(@PathVariable String id){
+    public UserResponse getUser(@PathVariable String userId){
 
-        UserResponse returnValue = new UserResponse();
-
-        UserDto userDto = userService.getUserByUserId(id);
+        UserDto userDto = userService.getUserByUserId(userId);
         // если будет копипропертис вместо маппера - то не сработает лист и тест не сработает
         ModelMapper modelMapper = new ModelMapper();
-        returnValue = modelMapper.map(userDto, UserResponse.class);
+        UserResponse returnValue = modelMapper.map(userDto, UserResponse.class);
         linkCreator.addLinkToUserResponse(returnValue);
 
         return returnValue;
-
     }
 
 
@@ -60,24 +58,40 @@ public class UserController {
     public UserResponse createUser(@RequestBody UserRequest userRequest) throws UserServiceException { // конвертирует Java объект в JSON файл
 
         UserResponse returnValue = new UserResponse();
-
         if (userRequest.getEmail().isEmpty()) {throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());}
-
         ModelMapper modelMapper = new ModelMapper();
         UserDto userDto = modelMapper.map(userRequest, UserDto.class); // копируются поля из одного класса в одноименные поля другого.
-
         userDto.setRoles(new HashSet<>(Arrays.asList(Role.ROLE_USER.name())));
-
         UserDto createdUser = userService.createUser(userDto); // валидируем юзера и создаем юзера без пассворда
         returnValue = modelMapper.map(createdUser, UserResponse.class);
 
         return  returnValue;
     }
 
+    // #id == principal.id говорит о том, что юзер может удалить сам себя но не другого юзера.
+    // principal означает текущего пользователя, обращающегося к URL
+    @PreAuthorize("hasRole('ROLE_ADMIN') or #userId == principal.userId")
+    @DeleteMapping (
+            path = "/{userId}",
+            produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
+    )
+    public OperationStatusModel deleteUser(@PathVariable String userId){
+        OperationStatusModel returnValue = new OperationStatusModel();
+        returnValue.setOperationName(RequestOperationName.DELETE.name());
+        returnValue.setOperationResult(ResponseOperationStatus.ERROR.name());
+
+        userService.deleteUser(userId);
+
+        returnValue.setOperationResult(ResponseOperationStatus.SUCCESS.name());
+        return returnValue;
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN') or #userId == principal.userId")
     @GetMapping(
             path = "/{userId}/certificates",
             produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
-    )public List<GiftCertificateResponse> getCertificatesOfUser(@PathVariable String userId){
+    )
+    public List<GiftCertificateResponse> getCertificatesOfUser(@PathVariable String userId){
         UserDto userDto = userService.getUserByUserId(userId);
         List <GiftCertificateResponse> returnValue = new ArrayList<>();
         Set<GiftCertificateDTO> certificatesDTO = userDto.getCertificates();
@@ -94,10 +108,12 @@ public class UserController {
     }
 
     // http://localhost:8080/labproject/user/{userId}/{certificateId}
+    @PreAuthorize("hasRole('ROLE_ADMIN') or #userId == principal.userId")
     @PutMapping(
             path = "/{userId}/{certificateId}",
             produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
-    )public UserResponse addCertificateToUser(@PathVariable String userId, @PathVariable Long certificateId){
+    )
+    public UserResponse addCertificateToUser(@PathVariable String userId, @PathVariable Long certificateId){
         UserDto userDto = userService.getUserByUserId(userId);
         GiftCertificateDTO certificateDTO = certificateService.getCertificate(certificateId);
         userDto.getCertificates().add(certificateDTO);
@@ -115,7 +131,8 @@ public class UserController {
     Выполнится верификация. И в базе данных верификейшнтокен исчезнет, а на месте
     email-verification-status будет 1, что соответствует верифицированному пользователю.
      */
-    @GetMapping(path = "/email-verification",
+    @GetMapping(
+            path = "/email-verification",
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_ATOM_XML_VALUE}
             )
     public OperationStatusModel verifyEmailToken(@RequestParam(value = "token") String token){
@@ -132,30 +149,16 @@ public class UserController {
         return returnValue;
     }
 
-    // #id == principal.id говорит о том, что юзер может удалить сам себя но не другого юзера.
-    @PreAuthorize("hasRole('ROLE_ADMIN') or #userId == principal.userId")
-    @DeleteMapping (
-            path = "/{userId}",
-            produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
-    )
-    public OperationStatusModel deleteUser(@PathVariable String userId){
-        OperationStatusModel returnValue = new OperationStatusModel();
-        returnValue.setOperationName(RequestOperationName.DELETE.name());
-        returnValue.setOperationResult(ResponseOperationStatus.ERROR.name());
 
-        userService.deleteUser(userId);
-
-        returnValue.setOperationResult(ResponseOperationStatus.SUCCESS.name());
-        return returnValue;
-    }
 
     //http://localhost:8080/labproject/user?page=3&limit=2 (выведет количество значений в соответствии с defaultValue of limit)
     // ссылка на метод гет по каждому юзеру
     // ссылки на следующую и предыдущую страницу этого же метода.
     @GetMapping (produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}) // с пагинацией
-    public CollectionModel<UserResponse> getUsers(@RequestParam(value = "page", defaultValue = "0") int page, //возвратит пустой лист , если поставить "1" defaltvalue
-                                                  @RequestParam(value = "limit", defaultValue = "25") int limit){
-
+    public CollectionModel<UserResponse> getUsers(
+            @RequestParam(value = "page", defaultValue = "0") int page, //возвратит пустой лист , если поставить "1" defaltvalue
+            @RequestParam(value = "limit", defaultValue = "25") int limit
+    ){
         List<UserResponse> responseValue = new ArrayList<>();
         List<UserDto> users = userService.getUsers(page, limit);
         ModelMapper modelMapper = new ModelMapper();
@@ -165,15 +168,12 @@ public class UserController {
             linkCreator.addLinkToUserResponse(userResponse);
             responseValue.add(userResponse);
         }
-
         CollectionModel<UserResponse> returnValue = linkCreator.getNavigationUserLinks(responseValue, page,limit);
-
         return returnValue;
     }
 
-    /**
-     * http://localhost:8080/labproject/user/password-reset-request/
-     */
+    //http://localhost:8080/labproject/user/password-reset-request/
+
 
     @PostMapping(
             path = "/password-reset-request",
@@ -195,7 +195,8 @@ public class UserController {
         return returnValue;
     }
 
-    @PostMapping(path = "/password-reset",
+    @PostMapping(
+            path = "/password-reset",
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
     )
     public OperationStatusModel resetPassword(@RequestBody PasswordResetModel passwordResetModel) {

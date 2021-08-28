@@ -12,6 +12,8 @@ public class SecurityConstants {
     public static final String VERIFICATION_EMAIL_URL = "/user/email-verification";
     public static final String PASSWORD_REQUEST_RESET_URL = "/user/password-reset-request";
     public static final String PASSWORD_RESET_URL = "/user/password-reset";
+    public static final String CERTIFICATES_URL = "/certificate/**";
+    public static final String TAGS_URL = "/tag/**";
 
 
     public static String getTokenSecret(){

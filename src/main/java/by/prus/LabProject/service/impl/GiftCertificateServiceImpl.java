@@ -77,7 +77,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
         certificateEntity.setDescription(giftCertificateDTO.getDescription());
         certificateEntity.setDuration(giftCertificateDTO.getDuration());
-        //certificateEntity.setCreateDate(giftCertificateDTO.getCreateDate()); не изменна эта дата.
+        //certificateEntity.setCreateDate(giftCertificateDTO.getCreateDate()); не изменна эта дата, т.к. дата создания.
         certificateEntity.setLastUpdateDate(giftCertificateDTO.getLastUpdateDate());
         certificateEntity.setName(giftCertificateDTO.getName());
         certificateEntity.setPrice(giftCertificateDTO.getPrice());

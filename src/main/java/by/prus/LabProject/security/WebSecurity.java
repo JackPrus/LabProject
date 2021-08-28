@@ -1,5 +1,8 @@
 package by.prus.LabProject.security;
 
+import by.prus.LabProject.repository.CertificateTagRepository;
+import by.prus.LabProject.repository.GiftCertificateRepository;
+import by.prus.LabProject.repository.TagRepository;
 import by.prus.LabProject.repository.UserRepository;
 import by.prus.LabProject.service.UserService;
 import org.springframework.http.HttpMethod;
@@ -10,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFilter;
 
 // позволяет использовать аннотацию @Secured в контроллере.
 //prePostEnabled позволяет делать аннотацию @PreAuthorized и @PostAuthorized
@@ -25,7 +29,8 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     public WebSecurity(
             UserService userDetailsService,
             BCryptPasswordEncoder bCryptPasswordEncoder,
-            UserRepository userRepository) {
+            UserRepository userRepository
+    ){
         this.userDetailsService = userDetailsService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userRepository = userRepository;
@@ -43,6 +48,10 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, SecurityConstants.PASSWORD_REQUEST_RESET_URL)
                 .permitAll()
                 .antMatchers(HttpMethod.POST, SecurityConstants.PASSWORD_RESET_URL)
+                .permitAll()
+                .antMatchers(HttpMethod.GET, SecurityConstants.CERTIFICATES_URL)
+                .permitAll()
+                .antMatchers(HttpMethod.GET, SecurityConstants.TAGS_URL)
                 .permitAll()
                 .antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**")
                 .permitAll()
@@ -75,10 +84,10 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 "/swagger-resources/**",
                 "/configuration/security",
                 "/swagger-ui.html",
-                "/webjars/**",
+                "/webjars/**"
                 //"/user/**",
-                "/tag/**",
-                "/certificate/**"
+                //"/tag/**",
+                //"/certificate/**"
                 );
     }
 }

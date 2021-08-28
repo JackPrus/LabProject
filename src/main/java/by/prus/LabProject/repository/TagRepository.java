@@ -30,10 +30,10 @@ public interface TagRepository extends PagingAndSortingRepository<TagEntity, Lon
     @Query(value="delete ct.*, t.* from certificate_tag ct LEFT JOIN  tag t ON t.id=ct.tag_id where ct.tag_id =?1", nativeQuery=true)
     void deleteTag(Long tagId);
 
-    @Query(value="select * from tag gc where name LIKE %:namePart%",nativeQuery=true)
+    @Query(value="select * from tag t where name LIKE %:namePart%",nativeQuery=true)
     List<TagEntity> findTagsByNamePart(@Param("namePart") String partOfName);
 
-    @Query(value="select * from tag gc where name LIKE %:namePart%",nativeQuery=true)
+    @Query(value="select * from tag t where name LIKE %:namePart%",nativeQuery=true)
     Page<TagEntity> findTagsByNamePartAbdReturnPage(@Param("namePart") String partOfName, Pageable pageAble);
 
 }

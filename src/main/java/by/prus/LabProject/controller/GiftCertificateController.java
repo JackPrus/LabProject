@@ -3,9 +3,11 @@ package by.prus.LabProject.controller;
 import by.prus.LabProject.exception.CertificateServiceException;
 import by.prus.LabProject.model.dto.GiftCertificateDTO;
 import by.prus.LabProject.model.request.GiftCertificateRequest;
+import by.prus.LabProject.model.request.RequestOperationName;
 import by.prus.LabProject.model.response.ErrorMessages;
 import by.prus.LabProject.model.response.GiftCertificateResponse;
 import by.prus.LabProject.model.response.OperationStatusModel;
+import by.prus.LabProject.model.response.ResponseOperationStatus;
 import by.prus.LabProject.service.GiftCertificateService;
 import by.prus.LabProject.service.relgenerator.LinkCreator;
 import org.modelmapper.ModelMapper;
@@ -14,6 +16,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -33,7 +36,8 @@ public class GiftCertificateController {
             produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}, // то что возвращает
             consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}  // то что принимает от клиента
     )
-    public GiftCertificateResponse createUser(@RequestBody GiftCertificateRequest certificate) { // конвертирует Java объект в JSON файл
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public GiftCertificateResponse createCertificate(@RequestBody GiftCertificateRequest certificate) { // конвертирует Java объект в JSON файл
 
         GiftCertificateResponse returnValue = new GiftCertificateResponse();
 
@@ -72,6 +76,7 @@ public class GiftCertificateController {
             produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
     )
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public GiftCertificateResponse updateCertificate (@PathVariable Long certificateId, @RequestBody GiftCertificateRequest giftCertificateRequest){
 
         if (!validateRequestCertificate(giftCertificateRequest)) {
@@ -89,8 +94,8 @@ public class GiftCertificateController {
 
     public boolean validateRequestCertificate(GiftCertificateRequest certificate){
 
-        if
-        (       certificate.getDescription().isEmpty() ||
+        if (
+                certificate.getDescription().isEmpty() ||
                 certificate.getDuration()==0 ||
                 certificate.getName().isEmpty() ||
                 certificate.getPrice() == null
@@ -104,13 +109,14 @@ public class GiftCertificateController {
             path = "{certificateId}",
             produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
     )
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public OperationStatusModel deleteCertificate (@PathVariable Long certificateId){
 
         OperationStatusModel returnValue = new OperationStatusModel();
-        returnValue.setOperationName("Delete of Certificate with Id: " +certificateId);
+        returnValue.setOperationName(RequestOperationName.DELETE.name());
 
         giftCertificateService.deleteCertificate(certificateId);
-        returnValue.setOperationResult("Status : Deleted successfuly");
+        returnValue.setOperationResult(ResponseOperationStatus.SUCCESS.name());
         return returnValue;
     }
 
