@@ -35,10 +35,10 @@ User Permissions:
      - ROLE_ADMIN (can be added only via database call and InitialUserSetup.class):
         * All operations, including addition and modification of entities.
 
-The scheme of entities below:
+The scheme of entities:
 
 ![alt text](tableScheme.png "table of entities")
 
-More sophisticated scheme describing entity relationships are below:
+More sophisticated scheme describing entity relationships:
 
 ![alt text](dbfullscheme.png "table with entities relations")
