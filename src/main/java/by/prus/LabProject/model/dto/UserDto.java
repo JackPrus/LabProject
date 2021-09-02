@@ -1,8 +1,12 @@
 package by.prus.LabProject.model.dto;
 
+import lombok.EqualsAndHashCode;
+
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
+@EqualsAndHashCode(exclude = {"id","certificates", "roles"})
 public class UserDto {
 
     private static final long serialVersionUID = 2345356456723452346L;
@@ -14,8 +18,8 @@ public class UserDto {
     private String encryptedPassword;
     private String emailVerificationToken;
     private Boolean emailVerificationStatus = false;
-    private Set<GiftCertificateDTO> certificates;
     private Collection<String> roles;
+    private List<GiftCertificateDTO> certificates;
 
     public long getId() { return id; }
     public void setId(long id) { this.id = id; }
@@ -33,6 +37,6 @@ public class UserDto {
     public void setEmailVerificationStatus(Boolean evailVerificationStatus) { this.emailVerificationStatus = evailVerificationStatus; }
     public Collection<String> getRoles() { return roles; }
     public void setRoles(Collection<String> roles) { this.roles = roles; }
-    public Set<GiftCertificateDTO> getCertificates() { return certificates; }
-    public void setCertificates(Set<GiftCertificateDTO> certificates) { this.certificates = certificates; }
+    public List<GiftCertificateDTO> getCertificates() { return certificates; }
+    public void setCertificates(List<GiftCertificateDTO> certificates) { this.certificates = certificates; }
 }

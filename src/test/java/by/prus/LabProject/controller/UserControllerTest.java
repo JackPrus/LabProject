@@ -2,16 +2,29 @@ package by.prus.LabProject.controller;
 
 import by.prus.LabProject.model.dto.GiftCertificateDTO;
 import by.prus.LabProject.model.dto.UserDto;
+import by.prus.LabProject.model.entity.GiftCertificateEntity;
+import by.prus.LabProject.model.entity.TagEntity;
+import by.prus.LabProject.model.entity.supporting.CertificateTag;
+import by.prus.LabProject.model.response.GiftCertificateResponse;
+import by.prus.LabProject.model.response.UserResponse;
 import by.prus.LabProject.service.impl.UserServiceImpl;
+import by.prus.LabProject.service.relgenerator.LinkCreator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.modelmapper.ModelMapper;
 
-import java.util.List;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class UserControllerTest {
 
@@ -22,9 +35,11 @@ class UserControllerTest {
 
     @Mock
     UserServiceImpl userService; //? почему не injectMock
+    @Mock
+    LinkCreator linkCreator;
 
     UserDto userDto;
-    final String USER_ID = "qwer";
+    final String USER_ID = "reqwrewqrewq";
 
     @BeforeEach
     void setUp() {
@@ -34,8 +49,8 @@ class UserControllerTest {
         userDto.setEmailVerificationStatus(Boolean.FALSE);
         userDto.setEmailVerificationToken(null);
         userDto.setUserId(USER_ID);
-        userDto.setAddresses(getAddressesDto());
-        userDto.setEncryptedPassword("xcf58tugh47");
+        userDto.setCertificates(getCertificateResponseList()); //2 штуки
+        userDto.setEncryptedPassword("qwerqwerrewqreqw");
     }
 
     @AfterEach
@@ -47,37 +62,57 @@ class UserControllerTest {
         // когда мы вызываем метод getUserById тогда мы возвращаем userDto
         when(userService.getUserByUserId(anyString())).thenReturn(userDto);
 
-        UserRest userRest = userController.getUser(USER_ID);
+        UserResponse userRest = userController.getUser(USER_ID);
 
         assertNotNull(userRest);
         assertEquals(USER_ID, userRest.getUserId());
-        assertEquals(userDto.getFirstName(), userRest.getFirstName());
-        assertEquals(userDto.getLastName(), userRest.getLastName());
-        assertTrue(userDto.getAddresses().size() == userRest.getAddresses().size());
+        assertTrue(userDto.getCertificates().size() == userRest.getCertificates().size());
+        assertEquals(userDto.getEmail(), userRest.getEmail());
     }
 
-    private List<GiftCertificateDTO> getAddressesDto() {
-        GiftCertificateDTO certificate = new GiftCertificateDTO();
-        certificate.setName("test sport certificate");
-        certificate.setDescription("description of sport Certificate");
-        certificate.setDuration(4);
-        certificate.setCertificateTags();
+    private List<GiftCertificateDTO> getCertificateResponseList() {//2 certResponse
+        List<GiftCertificateDTO> returnCollection = new ArrayList<>();
+        ModelMapper modelMapper = new ModelMapper();
 
-        AddressDTO billingAddressDto = new AddressDTO();
-        billingAddressDto.setType("billling");
-        billingAddressDto.setCity("Vancouver");
-        billingAddressDto.setCountry("Canada");
-        billingAddressDto.setPostalCode("ABC123");
-        billingAddressDto.setStreetName("123 Street name");
-
-        List<AddressDTO> addresses = new ArrayList<>();
-        addresses.add(addressDto);
-        addresses.add(billingAddressDto);
-
-        return addresses;
-
+        for (int i=0; i<2; i++){
+            GiftCertificateEntity certEntity = getCertificate();
+            GiftCertificateDTO certResponse = modelMapper.map(certEntity, GiftCertificateDTO.class);
+            certResponse.setCertificateTags(getCertificateTag());
+            returnCollection.add(certResponse);
+        }
+        return returnCollection;
     }
 
+    private List<CertificateTag> getCertificateTag() { // возвращает 3 элемента.
+
+        List<CertificateTag> listOfCertTags = new ArrayList<>();
+
+        for (int i=0 ; i<2; i++){
+            CertificateTag certificateTag = new CertificateTag();
+            listOfCertTags.add(certificateTag);
+        }
+
+        return listOfCertTags;
+    }
+
+    private GiftCertificateEntity getCertificate (){
+        GiftCertificateEntity cert = new GiftCertificateEntity();
+        cert.setName("testCert1");
+        cert.setDescription("description of cert1");
+        cert.setDuration(4);
+        cert.setPrice(new BigDecimal("12.50"));
+        cert.setCreateDate(LocalDate.now());
+        cert.setLastUpdateDate(LocalDate.now());
+        return cert;
+    }
+
+    private TagEntity getTag (){
+        TagEntity tag = new TagEntity();
+        tag.setName("testag1");
+        return tag;
+    }
+
+    //example how 'thenReturn' works like
     @Test
     public void iterator_will_return_hello_world() {
         //подготавливаем

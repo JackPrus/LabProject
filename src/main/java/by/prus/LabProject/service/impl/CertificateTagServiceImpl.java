@@ -20,7 +20,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.*;
+
 
 @Service
 public class CertificateTagServiceImpl implements CertificateTagService {
@@ -29,8 +31,18 @@ public class CertificateTagServiceImpl implements CertificateTagService {
     GiftCertificateRepository giftCertificateRepository;
     @Autowired
     TagRepository tagRepository;
+    @Autowired
+    ModelMapper modelMapper;
 
+    /**
+     *
+     * @param certificateId - id of certificate
+     * @param tagId - id of tag
+     * @return GifCertificateDTO object is middle betwen certificate and tag connection
+     * the method adds tag to certificate
+     */
     @Override
+    @Transactional
     public GiftCertificateDTO addTagToCertificate(Long certificateId, Long tagId) {
 
         GiftCertificateEntity certificateEntity = getCertificateWithId(certificateId);
@@ -46,7 +58,6 @@ public class CertificateTagServiceImpl implements CertificateTagService {
 
         certificateEntity.getCertificateTags().add(certificateTag);
 
-        ModelMapper modelMapper = new ModelMapper();
         GiftCertificateEntity updatedCertificate = giftCertificateRepository.save(certificateEntity);
         GiftCertificateDTO returnValue = modelMapper.map(updatedCertificate, GiftCertificateDTO.class);
 
@@ -54,6 +65,7 @@ public class CertificateTagServiceImpl implements CertificateTagService {
     }
 
     @Override
+    @Transactional
     public TagDTO addCertificateToTag(Long tagId, Long certificateId) {
 
         GiftCertificateEntity certificateEntity = getCertificateWithId(certificateId);
@@ -69,12 +81,20 @@ public class CertificateTagServiceImpl implements CertificateTagService {
 
         tagEntity.getCertificateTags().add(certificateTag);
 
-        ModelMapper modelMapper = new ModelMapper();
         TagEntity updatedTag = tagRepository.save(tagEntity);
         TagDTO returnValue = modelMapper.map(updatedTag, TagDTO.class);
 
         return returnValue;
     }
+
+    /**
+     * The method ask part of tag's name and page and limit to page for pageable request.
+     * @param tagName - part of name of tag
+     * @param page - number of page
+     * @param limit - limit of objects on page
+     * @return - List of GiftCertificateDTO that include information aboit connection
+     * between certificate and tag, tgat include tags as 'page' parametr
+     */
 
     @Override
     public List<GiftCertificateDTO> findCertificatesByTagName(String tagName, int page, int limit) {
@@ -84,10 +104,9 @@ public class CertificateTagServiceImpl implements CertificateTagService {
         Pageable pageableRequest = PageRequest.of(page,limit);
         Page<TagEntity> tagPage = tagRepository.findTagsByNamePartAbdReturnPage(tagName, pageableRequest);
         List<TagEntity> tagEntityList = tagPage.getContent();
-        ModelMapper modelMapper = new ModelMapper();
 
         for (TagEntity tag : tagEntityList){
-            Set<CertificateTag> connections = tag.getCertificateTags();
+            List<CertificateTag> connections = tag.getCertificateTags();
             for (CertificateTag certTag : connections){
                 GiftCertificateEntity certificateEntity = certTag.getGiftCertificate();
                 GiftCertificateDTO certificateDTO = modelMapper.map(certificateEntity, GiftCertificateDTO.class);
@@ -102,6 +121,9 @@ public class CertificateTagServiceImpl implements CertificateTagService {
 
     // всопомгательные методы ниже
 
+    /**
+     * methods below are supporting methods for actions above
+     */
     private GiftCertificateEntity getCertificateWithId(Long certificateId){
 
         Optional<GiftCertificateEntity> certificateOptional = giftCertificateRepository.findById(certificateId);

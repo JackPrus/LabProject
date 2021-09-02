@@ -28,5 +28,6 @@ public interface UserRepository extends PagingAndSortingRepository<UserEntity, L
             nativeQuery = true)
     Page<UserEntity> findAllUsersWithConfirmedEmailAddress( Pageable pageableRequest );
 // иметь ввиду что есть java awt pageable, а нам нужен именно org.springframework pageable
+    //В случае если мы делаем update или Create native запрос - нужны аннотации @Modyfying, @Transactional.
 
 }

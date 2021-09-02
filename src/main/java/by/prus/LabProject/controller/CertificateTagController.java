@@ -20,8 +20,16 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Dzmitry Prus.
+ * @version 1.0
+ * The methods of class implement actions between certificate and tag. Add tag to certificate or
+ * upside down for example.
+ */
+
 @RestController
 //http://localhost:8080/labproject/
+
 public class CertificateTagController {
 
     @Autowired
@@ -32,6 +40,8 @@ public class CertificateTagController {
     CertificateTagService certificateTagService;
     @Autowired
     LinkCreator linkCreator;
+    @Autowired
+    ModelMapper modelMapper;
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping(
@@ -43,7 +53,6 @@ public class CertificateTagController {
             @PathVariable Long tagId){
 
         GiftCertificateDTO certificateDTO = certificateTagService.addTagToCertificate(certificateId, tagId);
-        ModelMapper modelMapper = new ModelMapper();
         GiftCertificateResponse returnValue = modelMapper.map(certificateDTO, GiftCertificateResponse.class);
 
         return returnValue;
@@ -59,7 +68,6 @@ public class CertificateTagController {
             @PathVariable Long certificateId){
 
         TagDTO tagDTO = certificateTagService.addCertificateToTag(tagId, certificateId);
-        ModelMapper modelMapper = new ModelMapper();
         TagResponse returnValue = modelMapper.map(tagDTO, TagResponse.class);
 
         return returnValue;
@@ -77,7 +85,6 @@ public class CertificateTagController {
 
         List<GiftCertificateDTO> certificatesDTO = certificateTagService.findCertificatesByTagName(tagName, page, limit);
         List <GiftCertificateResponse> certValue = new ArrayList<>();
-        ModelMapper modelMapper = new ModelMapper();
 
         for (GiftCertificateDTO gcDTO : certificatesDTO){
             certValue.add(modelMapper.map(gcDTO, GiftCertificateResponse.class));

@@ -3,12 +3,14 @@ package by.prus.LabProject.model.entity.supporting;
 import by.prus.LabProject.model.entity.GiftCertificateEntity;
 import by.prus.LabProject.model.entity.TagEntity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "certificate_tag")
+@EqualsAndHashCode
 public class CertificateTag {
 
     @Id

@@ -1,6 +1,7 @@
 package by.prus.LabProject;
 
 import by.prus.LabProject.security.AppProperties;
+import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
@@ -27,6 +28,9 @@ public class LabProjectApplication extends SpringBootServletInitializer {
 
 	@Bean(name = "AppProperties")
 	public AppProperties appProperties () {return new AppProperties();}
+
+	@Bean
+	public ModelMapper modelMapper() { return new ModelMapper(); }
 
 
 }

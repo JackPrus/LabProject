@@ -18,9 +18,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 
 @Service
 public class TagServiceImpl implements TagService {
@@ -29,14 +31,16 @@ public class TagServiceImpl implements TagService {
     TagRepository tagRepository;
     @Autowired
     CertificateTagRepository certificateTagRepository;
+    @Autowired
+    ModelMapper modelMapper;
 
     @Override
+    @Transactional
     public TagDTO createTag(TagDTO tagDTO) {
 
         Optional<TagEntity> optionalTag =tagRepository.findById(tagDTO.getId());
         if (optionalTag.isPresent()){throw new TagServiceException("Error with creation new tag. Tag wit this ID already exists");}
 
-        ModelMapper modelMapper = new ModelMapper();
         TagEntity tagEntity = modelMapper.map(tagDTO, TagEntity.class);
         TagEntity storedTag = tagRepository.save(tagEntity);
         TagDTO returnValue = modelMapper.map(storedTag, TagDTO.class);
@@ -50,8 +54,6 @@ public class TagServiceImpl implements TagService {
         Optional<TagEntity> optionalTag =tagRepository.findById(id);
         if (optionalTag.isEmpty()){throw new TagServiceException("Tag with this ID does not exist");}
 
-        ModelMapper modelMapper = new ModelMapper();
-
         TagEntity storedTag = optionalTag.get();
         TagDTO returnValue = modelMapper.map(storedTag, TagDTO.class);
 
@@ -59,12 +61,12 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    @Transactional
     public TagDTO updateTag(Long tagId, TagDTO tagDTO) {
 
         Optional<TagEntity> optionalTag =tagRepository.findById(tagId);
         if (optionalTag.isEmpty()){throw new TagServiceException("Tag with this ID does not exist");}
 
-        ModelMapper modelMapper = new ModelMapper();
         TagEntity tagToUpdate = optionalTag.get();
         tagToUpdate.setName(tagDTO.getName());
         TagEntity updatedTag = tagRepository.save(tagToUpdate);
@@ -75,6 +77,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    @Transactional
     public void deleteTag(Long tagId) {
         Optional<TagEntity> tagOptional = tagRepository.findById(tagId);
         if (tagOptional.isEmpty()){
@@ -83,12 +86,16 @@ public class TagServiceImpl implements TagService {
         tagRepository.deleteTag(tagId);
     }
 
+    /**
+     * The method returning List of Tags, that have field having part of 'partOfCertName'
+     * param. In order to do it TagRepository use native @Query request.
+     * @param partOfName - pattern with regars to which one the method looking for certificates
+     * @return- List of tags having field 'name' including 'partOfName' param
+     */
     @Override
     public List<TagDTO> findTagByNamePart(String partOfName) {
         List<TagEntity> tagEntityList = tagRepository.findTagsByNamePart(partOfName);
         List<TagDTO> returnValue = new ArrayList<>();
-
-        ModelMapper modelMapper = new ModelMapper();
 
         for (TagEntity entity : tagEntityList){
             returnValue.add(modelMapper.map(entity, TagDTO.class));
@@ -104,8 +111,6 @@ public class TagServiceImpl implements TagService {
         Pageable pageableRequest = PageRequest.of(page, limit); // объект который мы засунем в репозиторий, чтобы достать результат по страницам
         Page<TagEntity> tagPage = tagRepository.findAll(pageableRequest); // находит нужную страницу юзеров
         List<TagEntity> tags = tagPage.getContent();
-
-        ModelMapper modelMapper = new ModelMapper();
 
         for (TagEntity tagEntity : tags) {
             TagDTO tagDTO = modelMapper.map(tagEntity, TagDTO.class);

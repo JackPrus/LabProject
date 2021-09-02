@@ -5,6 +5,7 @@ import by.prus.LabProject.model.entity.supporting.CertificateTag;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 public class TagResponse extends RepresentationModel<TagResponse> implements Serializable {
@@ -13,7 +14,7 @@ public class TagResponse extends RepresentationModel<TagResponse> implements Ser
 
     private long id;
     private String name;
-    private Set<CertificateTag> certificateTags;
+    private List<CertificateTag> certificateTags;
 
     public long getId() { return id; }
 
@@ -21,7 +22,7 @@ public class TagResponse extends RepresentationModel<TagResponse> implements Ser
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
-    public Set<CertificateTag> getCertificateTags() { return certificateTags; }
-    public void setCertificateTags(Set<CertificateTag> certificateTags) { this.certificateTags = certificateTags; }
+    public List<CertificateTag> getCertificateTags() { return certificateTags; }
+    public void setCertificateTags(List<CertificateTag> certificateTags) { this.certificateTags = certificateTags; }
 
 }

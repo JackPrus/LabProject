@@ -1,6 +1,7 @@
 package by.prus.LabProject.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -8,6 +9,7 @@ import java.util.Collection;
 
 @Entity
 @Table(name = "authority")
+@EqualsAndHashCode
 public class AuthorityEntity implements Serializable {
 
     private static final long serialVerisonUID = 2342355453245L;

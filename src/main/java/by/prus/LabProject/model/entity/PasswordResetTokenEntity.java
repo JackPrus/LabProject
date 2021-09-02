@@ -1,9 +1,12 @@
 package by.prus.LabProject.model.entity;
 
+import lombok.EqualsAndHashCode;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity(name = "password_reset_token")
+@EqualsAndHashCode
 public class PasswordResetTokenEntity implements Serializable {
 
     private static final long serialVersionUID = 5879785695135817255L;

@@ -11,6 +11,12 @@ import org.springframework.stereotype.Repository;
 import javax.transaction.Transactional;
 import java.util.List;
 
+/**
+ * The repository created for CertificateTag entity. The object CertificateTag used for
+ * storage of networks betwen certificate and tag.
+ * @ManyToMany connection betwen certificate and tag is implemented as 2 @OneToMany connections
+ * so and CertificateTag object is the middle object betwen them
+ */
 @Repository
 public interface CertificateTagRepository extends PagingAndSortingRepository<CertificateTag, Long> {
 

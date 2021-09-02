@@ -22,6 +22,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Dzmitry Prus.
+ * @version 1.0
+ * The methods of class implement CRUD and others operations with certificate.
+ */
+
+
 @RestController
 @RequestMapping("/certificate")
 //http://localhost:8080/labproject/certificate/
@@ -31,6 +38,8 @@ public class GiftCertificateController {
     GiftCertificateService giftCertificateService;
     @Autowired
     LinkCreator linkCreator;
+    @Autowired
+    ModelMapper modelMapper;
 
     @PostMapping(
             produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}, // то что возвращает
@@ -45,7 +54,6 @@ public class GiftCertificateController {
             throw new CertificateServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
         }
 
-        ModelMapper modelMapper = new ModelMapper();
         GiftCertificateDTO giftCertificateDTO = modelMapper.map(certificate, GiftCertificateDTO.class); // копируются поля из одного класса в одноименные поля другого.
 
         GiftCertificateDTO createdCertificate = giftCertificateService.createCertificate(giftCertificateDTO); // валидируем юзера и создаем юзера без пассворда
@@ -60,7 +68,6 @@ public class GiftCertificateController {
     )
     public GiftCertificateResponse getCertificate (@PathVariable Long id){
 
-        ModelMapper modelMapper = new ModelMapper();
 
         GiftCertificateDTO giftCertificateDTO = giftCertificateService.getCertificate(id);
         GiftCertificateResponse returnValue = modelMapper.map(giftCertificateDTO, GiftCertificateResponse.class);
@@ -83,7 +90,6 @@ public class GiftCertificateController {
             throw new CertificateServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
         }
 
-        ModelMapper modelMapper = new ModelMapper();
         GiftCertificateDTO certificateDTO = modelMapper.map(giftCertificateRequest, GiftCertificateDTO.class);
         GiftCertificateDTO updatedCertificate = giftCertificateService.updateCertificate(certificateId, certificateDTO);
 
@@ -127,7 +133,6 @@ public class GiftCertificateController {
     public List<GiftCertificateResponse> getListOfCertificatesByPartOfName (@PathVariable String partOfCertName){
         List<GiftCertificateDTO> certificatesDTO = giftCertificateService.findCertificatesByNamePart(partOfCertName);
         List <GiftCertificateResponse> returnValue = new ArrayList<>();
-        ModelMapper modelMapper = new ModelMapper();
 
         for (GiftCertificateDTO gcDTO : certificatesDTO){
             returnValue.add(modelMapper.map(gcDTO, GiftCertificateResponse.class));
@@ -135,7 +140,16 @@ public class GiftCertificateController {
         return returnValue;
     }
 
-    //ПАГИНАЦИЯ + hateoas ссылки
+    /**
+     *
+     * @param page - number of pagge mapped in URL
+     * @param limit - limit of GiftCertificateResponse objects represented in JSON or XML view per page.
+     * @return - Collection of GiftCertificateResponse in quantity equals 'limit' vlue.
+     *
+     * The pagination and HATEOAS lincs were used here
+     * @see - LinkCreator.class
+     */
+
     //http://localhost:8080/labproject/certificate?page=3&limit=2 (выведет количество значений в соответствии с defaultValue of limit)
     @GetMapping (produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}) // с пагинацией
     public CollectionModel<GiftCertificateResponse> getCertificates(
@@ -144,8 +158,6 @@ public class GiftCertificateController {
     ){
         List<GiftCertificateResponse> responseValue = new ArrayList<>();
         List<GiftCertificateDTO> certificates = giftCertificateService.getCertificates(page, limit);
-
-        ModelMapper modelMapper = new ModelMapper();
 
         for (GiftCertificateDTO certDTO : certificates){
             GiftCertificateResponse certRespons = modelMapper.map(certDTO, GiftCertificateResponse.class);

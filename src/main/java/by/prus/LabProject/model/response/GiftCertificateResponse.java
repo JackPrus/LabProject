@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 public class GiftCertificateResponse extends RepresentationModel<GiftCertificateResponse> implements Serializable {
@@ -23,7 +24,7 @@ public class GiftCertificateResponse extends RepresentationModel<GiftCertificate
     private int duration;
     private LocalDate createDate;
     private LocalDate lastUpdateDate;
-    private Set<CertificateTag> certificateTags;
+    private List<CertificateTag> certificateTags;
 
     public long getId() { return id; }
     public void setId(long id) { this.id = id; }
@@ -39,7 +40,6 @@ public class GiftCertificateResponse extends RepresentationModel<GiftCertificate
     public void setCreateDate(LocalDate createDate) { this.createDate = createDate; }
     public LocalDate getLastUpdateDate() { return lastUpdateDate; }
     public void setLastUpdateDate(LocalDate lastUpdateDate) { this.lastUpdateDate = lastUpdateDate; }
-    public Set<CertificateTag> getCertificateTags() { return certificateTags; }
-    public void setCertificateTags(Set<CertificateTag> certificateTags) { this.certificateTags = certificateTags; }
-
+    public List<CertificateTag> getCertificateTags() { return certificateTags; }
+    public void setCertificateTags(List<CertificateTag> certificateTags) { this.certificateTags = certificateTags; }
 }

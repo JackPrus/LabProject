@@ -23,6 +23,12 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Dzmitry Prus.
+ * @version 1.0
+ * The methods of class implement CRUD and others operations with tag.
+ */
+
 @RestController
 @RequestMapping ("/tag")
 //http://localhost:8080/labproject/tag/
@@ -32,6 +38,8 @@ public class TagController {
     TagService tagService;
     @Autowired
     LinkCreator linkCreator;
+    @Autowired
+    ModelMapper modelMapper;
 
 
     @PostMapping(
@@ -47,7 +55,6 @@ public class TagController {
             throw new TagServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
         }
 
-        ModelMapper modelMapper = new ModelMapper();
         TagDTO tagDTO = modelMapper.map(tagRequest, TagDTO.class);
 
         TagDTO createdTag = tagService.createTag(tagDTO);
@@ -62,7 +69,6 @@ public class TagController {
     )
     public TagResponse getTag (@PathVariable Long id){
 
-        ModelMapper modelMapper = new ModelMapper();
         TagDTO tagDTO = tagService.getTag(id);
 
         TagResponse returnValue = modelMapper.map(tagDTO, TagResponse.class);
@@ -84,7 +90,6 @@ public class TagController {
             throw new TagServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
         }
 
-        ModelMapper modelMapper = new ModelMapper();
         TagDTO tagToUpdate = modelMapper.map(tagRequest, TagDTO.class);
 
         TagDTO updatedTag = tagService.updateTag(tagId, tagToUpdate);
@@ -115,7 +120,6 @@ public class TagController {
     public List<TagResponse> getListOfTagsByPartOfName (@PathVariable String partOfTagName){
         List<TagDTO> tagsDTO = tagService.findTagByNamePart(partOfTagName);
         List<TagResponse> returnValue = new ArrayList<>();
-        ModelMapper modelMapper = new ModelMapper();
 
         for (TagDTO tagDTO : tagsDTO){
             returnValue.add(modelMapper.map(tagDTO, TagResponse.class));
@@ -123,7 +127,16 @@ public class TagController {
         return returnValue;
     }
 
-    //ПАГИНАЦИЯ + hateoas ссылки
+    /**
+     *
+     * @param page - number of pagge mapped in URL
+     * @param limit - limit of Tag objects represented in JSON or XML view per page.
+     * @return - Collection of Tag in quantity equals 'limit' vlue.
+     *
+     * The pagination and HATEOAS lincs were used here
+     * @see - LinkCreator.class
+     */
+
     //http://localhost:8080/labproject/tag?page=3&limit=2 (выведет количество значений в соответствии с defaultValue of limit)
     @GetMapping (produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}) // с пагинацией
     public CollectionModel<TagResponse> getTags(
@@ -133,7 +146,6 @@ public class TagController {
         List<TagResponse> responseValue = new ArrayList<>();
         List<TagDTO> tags = tagService.getTags(page, limit);
 
-        ModelMapper modelMapper = new ModelMapper();
 
         for (TagDTO tagDTO : tags){
             TagResponse tagResponse = modelMapper.map(tagDTO, TagResponse.class);

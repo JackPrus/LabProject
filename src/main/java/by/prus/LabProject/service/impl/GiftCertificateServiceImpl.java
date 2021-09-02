@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,8 +31,17 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Autowired
     GiftCertificateRepository giftCertificateRepository;
+    @Autowired
+    ModelMapper modelMapper;
 
+
+    /**
+     * The method creates a certificate. Create date and lastUpdateDate getting today's.
+     * @param giftCertificateDTO - object with reagards to which one the certificate must be created
+     * @return - resulting object when certificate is created
+     */
     @Override
+    @Transactional
     public GiftCertificateDTO createCertificate(GiftCertificateDTO giftCertificateDTO) {
 
         Optional<GiftCertificateEntity> optionalCertificate = giftCertificateRepository.findById(giftCertificateDTO.getId());
@@ -42,7 +52,6 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         giftCertificateDTO.setCreateDate(LocalDate.now());
         giftCertificateDTO.setLastUpdateDate(LocalDate.now());
 
-        ModelMapper modelMapper = new ModelMapper();
         GiftCertificateEntity giftCertificateEntity =modelMapper.map(giftCertificateDTO, GiftCertificateEntity.class);
         GiftCertificateEntity storedCertificate = giftCertificateRepository.save(giftCertificateEntity);
         GiftCertificateDTO returnValue = modelMapper.map(storedCertificate, GiftCertificateDTO.class);
@@ -58,14 +67,21 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             throw new CertificateServiceException("certificate with this ID does not exist");
         }
 
-        ModelMapper modelMapper = new ModelMapper();
         GiftCertificateEntity certificateEntity = optionalCertificate.get();
         GiftCertificateDTO returnValue = modelMapper.map(certificateEntity, GiftCertificateDTO.class);
 
         return returnValue;
     }
 
+    /**
+     * The method updating data of some exact certificate. The 'lastUpdateDate' becames today's.
+     * 'createDate' should be passed
+     * @param certificateId - id of Certificate need to update
+     * @param giftCertificateDTO - an oject including data to update
+     * @return -
+     */
     @Override
+    @Transactional
     public GiftCertificateDTO updateCertificate(Long certificateId, GiftCertificateDTO giftCertificateDTO) {
 
         Optional<GiftCertificateEntity> optionalCertificate = giftCertificateRepository.findById(certificateId);
@@ -83,13 +99,13 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         certificateEntity.setPrice(giftCertificateDTO.getPrice());
 
         GiftCertificateEntity updatedCertificate = giftCertificateRepository.save(certificateEntity);
-        ModelMapper modelMapper = new ModelMapper();
         GiftCertificateDTO returnValue = modelMapper.map(updatedCertificate, GiftCertificateDTO.class);
 
         return returnValue;
     }
 
     @Override
+    @Transactional
     public void deleteCertificate(Long certificateId) {
         Optional<GiftCertificateEntity> certificateOptional = giftCertificateRepository.findById(certificateId);
         if (certificateOptional.isEmpty()){
@@ -98,13 +114,17 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         giftCertificateRepository.deleteCertificate(certificateId);
     }
 
+    /**
+     * The method returning List of Certificates, that ine name field have part of 'partOfCertName'
+     * param. In order to do it GiftCertificateRepository use native @Query request.
+     * @param partOfCertName - pattern with regars to which one the method looking for certificates
+     * @return- List of certificates having field 'name' including 'partOfCertName' param
+     */
     @Override
     public List<GiftCertificateDTO> findCertificatesByNamePart(String partOfCertName) {
 
         List<GiftCertificateEntity> certificateList = giftCertificateRepository.findCertificatesByNamePart(partOfCertName);
         List<GiftCertificateDTO> returnValue = new ArrayList<>();
-
-        ModelMapper modelMapper = new ModelMapper();
 
         for (GiftCertificateEntity entity : certificateList){
             returnValue.add(modelMapper.map(entity, GiftCertificateDTO.class));
@@ -121,8 +141,6 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         Pageable pageableRequest = PageRequest.of(page, limit); // объект который мы засунем в репозиторий, чтобы достать результат по страницам
         Page<GiftCertificateEntity> certificatePage = giftCertificateRepository.findAll(pageableRequest); // находит нужную страницу юзеров
         List<GiftCertificateEntity> certificates = certificatePage.getContent();
-
-        ModelMapper modelMapper = new ModelMapper();
 
         for (GiftCertificateEntity certEntity : certificates) {
             GiftCertificateDTO certDTO = modelMapper.map(certEntity, GiftCertificateDTO.class);

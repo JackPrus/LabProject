@@ -24,6 +24,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * The class initializing first 5 users including 1 user with Admin role. In case our DB
+ * has 5 or more users and Admin user, the class do nothing.
+ */
 @Component
 public class InitialUserSetup {
 

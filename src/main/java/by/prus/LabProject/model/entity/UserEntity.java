@@ -1,6 +1,7 @@
 package by.prus.LabProject.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -10,6 +11,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "user")
+@EqualsAndHashCode(exclude = {"id","rolesOfUser","certificatesOfUser"})
 public class UserEntity implements Serializable {
 
     private static final long serialVerisonUID = 2342353453245L;
@@ -44,6 +46,9 @@ public class UserEntity implements Serializable {
     )
     private Collection<RoleEntity> rolesOfUser;
 
+    // Если тип List и FetchType.Eager - будет MultipleBagFetchException. Если сменить на Set, или поставить Lazy - не будет. Выяснить почему.
+    // не ставить Set чтобы избежать проблемы. Т.к. по факту мы от нее не избавляемся а скрываем.
+    // https://stackoverflow.com/questions/4334970/hibernate-throws-multiplebagfetchexception-cannot-simultaneously-fetch-multipl/51055523?stw=2#51055523
     @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
     @JsonManagedReference
     @JoinTable(

@@ -2,6 +2,7 @@ package by.prus.LabProject.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -9,6 +10,7 @@ import java.util.Collection;
 
 @Entity
 @Table(name ="role")
+@EqualsAndHashCode(exclude = {"users", "authoritiesOfRole"})
 public class RoleEntity implements Serializable {
 
     private static final long serialVersionUID = 5879723455135817255L;

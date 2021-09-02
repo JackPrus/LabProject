@@ -10,10 +10,10 @@ public class UserResponse extends RepresentationModel<UserResponse> {
 
     private String userId;
     private String email;
-    private Set<GiftCertificateResponse> certificates;
+    private List<GiftCertificateResponse> certificates;
 
-    public Set<GiftCertificateResponse> getCertificates() { return certificates; }
-    public void setCertificates(Set<GiftCertificateResponse> certificates) { this.certificates = certificates; }
+    public List<GiftCertificateResponse> getCertificates() { return certificates; }
+    public void setCertificates(List<GiftCertificateResponse> certificates) { this.certificates = certificates; }
     public String getUserId() { return userId; }
     public void setUserId(String userId) { this.userId = userId; }
     public String getEmail() { return email; }

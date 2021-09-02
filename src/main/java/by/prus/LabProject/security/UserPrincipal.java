@@ -10,6 +10,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.HashSet;
 
+/**
+ * The object returns by Spring Security when call 'loadUserByUsername(String email)' method.
+ */
 public class UserPrincipal implements UserDetails {
 
     private static final long serialVersionUID = 587972456817255L;
@@ -49,37 +52,18 @@ public class UserPrincipal implements UserDetails {
     }
 
     @Override
-    public String getPassword() {
-        return this.userEntity.getEncryptedPassword();
-    }
-
+    public String getPassword() { return this.userEntity.getEncryptedPassword();}
     @Override
-    public String getUsername() {
-        return this.userEntity.getEmail();
-    }
-
+    public String getUsername() { return this.userEntity.getEmail();}
     @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
+    public boolean isAccountNonExpired() { return true;}
     @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
+    public boolean isAccountNonLocked() { return true;}
     @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
+    public boolean isCredentialsNonExpired() { return true;}
     @Override
-    public boolean isEnabled() {
-        return this.userEntity.getEmailVerificationStatus();
-    }
-
-
+    public boolean isEnabled() { return this.userEntity.getEmailVerificationStatus();}
     public String getUserId() { return userId; }
-    public void setUserId(String userId) { this.userId = userId; }
+    public void setUserId(String userId) { this.userId = userId;}
 
 }

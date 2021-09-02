@@ -22,6 +22,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+/**
+ * @author Dzmitry Prus.
+ * @version 1.0
+ * The methods of class implement CRUD and others operations with tag.
+ * Returns list of users, list of certificates of some exact user, email verification and password reset
+ */
+
 @RestController
 @RequestMapping("user")
 //http://localhost:8080/labproject/user/
@@ -33,6 +40,8 @@ public class UserController {
     GiftCertificateService certificateService;
     @Autowired
     LinkCreator linkCreator;
+    @Autowired
+    ModelMapper modelMapper;
 
     @PostAuthorize("hasRole('ROLE_ADMIN') or #userId == principal.userId")
     @GetMapping(
@@ -40,16 +49,11 @@ public class UserController {
             produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
     )
     public UserResponse getUser(@PathVariable String userId){
-
         UserDto userDto = userService.getUserByUserId(userId);
-        // если будет копипропертис вместо маппера - то не сработает лист и тест не сработает
-        ModelMapper modelMapper = new ModelMapper();
         UserResponse returnValue = modelMapper.map(userDto, UserResponse.class);
         linkCreator.addLinkToUserResponse(returnValue);
-
         return returnValue;
     }
-
 
     @PostMapping(
             produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
@@ -57,13 +61,11 @@ public class UserController {
     )
     public UserResponse createUser(@RequestBody UserRequest userRequest) throws UserServiceException { // конвертирует Java объект в JSON файл
 
-        UserResponse returnValue = new UserResponse();
         if (userRequest.getEmail().isEmpty()) {throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());}
-        ModelMapper modelMapper = new ModelMapper();
         UserDto userDto = modelMapper.map(userRequest, UserDto.class); // копируются поля из одного класса в одноименные поля другого.
         userDto.setRoles(new HashSet<>(Arrays.asList(Role.ROLE_USER.name())));
         UserDto createdUser = userService.createUser(userDto); // валидируем юзера и создаем юзера без пассворда
-        returnValue = modelMapper.map(createdUser, UserResponse.class);
+        UserResponse returnValue = modelMapper.map(createdUser, UserResponse.class);
 
         return  returnValue;
     }
@@ -94,8 +96,7 @@ public class UserController {
     public List<GiftCertificateResponse> getCertificatesOfUser(@PathVariable String userId){
         UserDto userDto = userService.getUserByUserId(userId);
         List <GiftCertificateResponse> returnValue = new ArrayList<>();
-        Set<GiftCertificateDTO> certificatesDTO = userDto.getCertificates();
-        ModelMapper modelMapper = new ModelMapper();
+        List<GiftCertificateDTO> certificatesDTO = userDto.getCertificates();
 
         for (GiftCertificateDTO certificateDTO : certificatesDTO){
             GiftCertificateResponse certResponse = modelMapper.map(certificateDTO, GiftCertificateResponse.class);
@@ -118,7 +119,6 @@ public class UserController {
         GiftCertificateDTO certificateDTO = certificateService.getCertificate(certificateId);
         userDto.getCertificates().add(certificateDTO);
         UserDto updatedUser = userService.updateUser(userId, userDto);
-        ModelMapper modelMapper = new ModelMapper();
         return modelMapper.map(updatedUser, UserResponse.class);
     }
 
@@ -130,6 +130,13 @@ public class UserController {
     При выполнении гет запроса выше, где в качестве токена будет указан этот токен
     Выполнится верификация. И в базе данных верификейшнтокен исчезнет, а на месте
     email-verification-status будет 1, что соответствует верифицированному пользователю.
+     */
+
+    /**
+     * @param token - token will be created and sent to user's email when user created
+     * @return - result of operation of sending email ERROR or SUCCESS
+     * when userController creates user cerate method ask this method to send email including verification token
+     * when email-verificateion will be done in database column will be 1 that means user verified.
      */
     @GetMapping(
             path = "/email-verification",
@@ -150,6 +157,13 @@ public class UserController {
     }
 
 
+    /**
+     *
+     * @param page - number of pagge mapped in URL
+     * @param limit - limit of Users objects represented in JSON or XML view per page.
+     * @return - Collection of users in page quantity
+     * Hateoas return links for every user. Ass well implemented presentation of links to next and previous page.
+     */
 
     //http://localhost:8080/labproject/user?page=3&limit=2 (выведет количество значений в соответствии с defaultValue of limit)
     // ссылка на метод гет по каждому юзеру
@@ -161,7 +175,6 @@ public class UserController {
     ){
         List<UserResponse> responseValue = new ArrayList<>();
         List<UserDto> users = userService.getUsers(page, limit);
-        ModelMapper modelMapper = new ModelMapper();
 
         for (UserDto userDto : users){
             UserResponse userResponse = modelMapper.map(userDto, UserResponse.class);

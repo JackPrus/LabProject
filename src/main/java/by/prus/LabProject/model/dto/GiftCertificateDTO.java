@@ -3,6 +3,7 @@ package by.prus.LabProject.model.dto;
 import by.prus.LabProject.model.entity.TagEntity;
 import by.prus.LabProject.model.entity.supporting.CertificateTag;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import javax.validation.constraints.Digits;
@@ -12,8 +13,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+@EqualsAndHashCode(exclude = {"certificateTags"})
 public class GiftCertificateDTO implements Serializable {
 
     private static final long serialVersionUID = 2345356234623452346L;
@@ -25,7 +28,7 @@ public class GiftCertificateDTO implements Serializable {
     private int duration;
     private LocalDate createDate;
     private LocalDate lastUpdateDate;
-    private Set<CertificateTag> certificateTags;
+    private List<CertificateTag> certificateTags;
 
 
     public long getId() { return id; }
@@ -42,7 +45,7 @@ public class GiftCertificateDTO implements Serializable {
     public void setCreateDate(LocalDate createDate) { this.createDate = createDate; }
     public LocalDate getLastUpdateDate() { return lastUpdateDate; }
     public void setLastUpdateDate(LocalDate lastUpdateDate) { this.lastUpdateDate = lastUpdateDate; }
-    public Set<CertificateTag> getCertificateTags() { return certificateTags; }
-    public void setCertificateTags(Set<CertificateTag> certificateTags) { this.certificateTags = certificateTags; }
+    public List<CertificateTag> getCertificateTags() { return certificateTags; }
+    public void setCertificateTags(List<CertificateTag> certificateTags) { this.certificateTags = certificateTags; }
 
 }

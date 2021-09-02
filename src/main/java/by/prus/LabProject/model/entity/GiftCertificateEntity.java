@@ -3,6 +3,7 @@ package by.prus.LabProject.model.entity;
 
 import by.prus.LabProject.model.entity.supporting.CertificateTag;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -11,10 +12,12 @@ import javax.validation.constraints.Min;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Entity
 @Table(name = "gift_certificate")
+@EqualsAndHashCode(exclude = {"certificateTags", "usersOfCertificate"})
 public class GiftCertificateEntity implements Serializable {
 
     private static final long serialVerisonUID = 2342353453245L;
@@ -51,11 +54,11 @@ public class GiftCertificateEntity implements Serializable {
 
     @JsonBackReference
     @OneToMany(mappedBy = "giftCertificate", cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
-    private Set<CertificateTag> certificateTags;
+    private List<CertificateTag> certificateTags;
 
     @JsonBackReference
     @ManyToMany(mappedBy = "certificatesOfUser")
-    private Set<UserEntity> usersOfCertificate;
+    private List<UserEntity> usersOfCertificate;
 
     /*
     Many to many examples
@@ -77,9 +80,9 @@ public class GiftCertificateEntity implements Serializable {
     public void setCreateDate(LocalDate createDate) { this.createDate = createDate; }
     public LocalDate getLastUpdateDate() { return lastUpdateDate; }
     public void setLastUpdateDate(LocalDate lastUpdateDate) { this.lastUpdateDate = lastUpdateDate; }
-    public Set<CertificateTag> getCertificateTags() { return certificateTags; }
-    public void setCertificateTags(Set<CertificateTag> certificateTags) { this.certificateTags = certificateTags; }
-    public Set<UserEntity> getUsersOfCertificate() { return usersOfCertificate; }
-    public void setUsersOfCertificate(Set<UserEntity> usersOfCertificate) { this.usersOfCertificate = usersOfCertificate; }
+    public List<CertificateTag> getCertificateTags() { return certificateTags; }
+    public void setCertificateTags(List<CertificateTag> certificateTags) { this.certificateTags = certificateTags; }
+    public List<UserEntity> getUsersOfCertificate() { return usersOfCertificate; }
+    public void setUsersOfCertificate(List<UserEntity> usersOfCertificate) { this.usersOfCertificate = usersOfCertificate; }
 
 }
